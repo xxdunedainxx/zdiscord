@@ -1,3 +1,10 @@
+# Ignore config files
+zdiscord/app.json
+zdiscord/conf.json
+
+# log ignore
+./log/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

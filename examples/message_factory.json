@@ -1,0 +1,29 @@
+{
+  "default" : {
+    "type" : "str",
+    "resp" : "uhhhhhhhh",
+    "fallback" : "The road ends here..."
+  },
+  "giphy" : {
+    "type" : "lambda",
+    "resp" : "",
+    "main" : "self.services_ref['giphy'].get_giphy"
+  },
+  "weather" : {
+    "type" : "lambda",
+    "resp" : "",
+    "main" : "self.services_ref['weather'].get_and_format"
+  },
+  "stocks" : {
+    "type" : "lambda",
+    "resp" : "",
+    "main" : "self.services_ref['alphav'].get_stock_info"
+  },
+  "gold" : {
+    "type" : "static_method",
+    "resp" : "",
+    "main" : "self.services_ref['alphav'].get_stock_info",
+    "arg" : "GOLD",
+    "syncMsg" : "getting gold info..."
+  }
+}

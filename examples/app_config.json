@@ -1,0 +1,21 @@
+{
+  "chat" : {
+    "token" : "*****"
+  },
+  "message_factory" : "./zdiscord/conf.json",
+  "giphy" : {
+    "url": "https://api.giphy.com/v1/gifs",
+    "token" : "*****"
+  },
+  "weather" : {
+    "url": "http://api.openweathermap.org/data/2.5",
+    "token" : "*****"
+  },
+  "alphav" : {
+    "url": "https://www.alphavantage.co",
+    "token" : "*****"
+  },
+  "log" : {
+    "log_dir" : "log"
+  }
+}
