@@ -1,6 +1,7 @@
 # Ignore config files
 zdiscord/app.json
 zdiscord/conf.json
+zdiscord/vf.json
 .idea/workspace.xml
 
 # log ignore

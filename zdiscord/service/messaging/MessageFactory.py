@@ -1,5 +1,4 @@
 from zdiscord.service.Service import Service
-from zdiscord.service.Service import Service
 import json
 from typing import Any
 

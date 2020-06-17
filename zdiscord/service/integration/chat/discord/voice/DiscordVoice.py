@@ -75,7 +75,7 @@ class DiscordVoice(commands.Cog):
     async def stream(self, ctx, *, url):
         """Streams from a url (same as yt, but doesn't predownload)"""
 
-        player = await YTDLSource.from_url(url, loop=self.bot.loop)
+        player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
         ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
     async def stop(self, ctx):

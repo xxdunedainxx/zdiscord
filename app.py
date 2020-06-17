@@ -9,6 +9,7 @@ from zdiscord.App import App
 # TODO CLI configuration for app.json
 # TODO If app crashes, restart discord bot?
 # TODO Health check on voice client
+# TODO :Error handling for uneeded things like voice factory creation
 # https://stackoverflow.com/questions/42999961/ffmpeg-binary-not-found-python
 
 app = App(config_path="./zdiscord/app.json")

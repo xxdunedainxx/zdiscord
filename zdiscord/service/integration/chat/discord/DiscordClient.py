@@ -1,5 +1,6 @@
 from zdiscord.service.integration.chat.IChatClient import IChatClient
 from zdiscord.service.messaging.MessageFactory import MessageFactory
+from zdiscord.service.messaging.VoiceFactory import VoiceFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.service.integration.chat.discord.voice.DiscordVoice import DiscordVoice
 import requests
@@ -7,11 +8,12 @@ import discord
 
 class DiscordBot(discord.Client, IChatClient):
 
-    def __init__(self, messager: MessageFactory ):
+    def __init__(self, messager: MessageFactory, voice: VoiceFactory ):
         IChatClient.__init__(self, name='DiscordBot')
         discord.Client.__init__(self)
 
         self.__mf: MessageFactory = messager
+        self.__vf: VoiceFactory = voice
         self.__voice_client: DiscordVoice = None
     # TODO : 'init_voice_client()'
 
@@ -22,7 +24,7 @@ class DiscordBot(discord.Client, IChatClient):
         chan: discord.VoiceChannel = None
         for ch in channels:
             print("checking channel...")
-            if ch.name == 'Team Rheem':
+            if ch.name == self.__vf.channel:
                 chan = ch
                 break
 
@@ -67,6 +69,8 @@ class DiscordBot(discord.Client, IChatClient):
     async def on_voice_state_update(self, member, before, after):
         if member.name == self.user or member.bot is True:
             return
-        if after.channel != None:
+        elif after.channel != None and after.channel.name == self.__vf.channel:
             busters: discord.Guild = self.guilds[0]
-            await self.__voice_client.stream(ctx=busters, url="https://www.youtube.com/embed/kYXRfwXfz5A")  # "https://youtu.be/EBudj01e9OY")
+            await self.__voice_client.stream(ctx=busters, url=self.__vf.stream_link) #"https://www.youtube.com/embed/kYXRfwXfz5A")  # "https://youtu.be/EBudj01e9OY")
+        else:
+            self._logger.info("Not correct event..")

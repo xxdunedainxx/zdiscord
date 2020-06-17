@@ -3,6 +3,7 @@ from zdiscord.service.integration.giphy.Giphy import Giphy
 from zdiscord.service.integration.alphav.AlphaV import AlphaV
 from zdiscord.service.integration.chat.discord.DiscordClient import DiscordBot
 from zdiscord.service.messaging.MessageFactory import MessageFactory
+from zdiscord.service.messaging.VoiceFactory import VoiceFactory
 from zdiscord.util.logging.LogFactory import LogFactory
 
 import json
@@ -59,7 +60,8 @@ class App:
         else:
             # TODO generic service config
             self.messager = MessageFactory(self.conf['message_factory'], servicesRefeence={'giphy' : self.giphy, 'weather' : self.weather, 'alphav': self.alphav})
-            self.discord = DiscordBot(messager=self.messager)
+            self.voice = VoiceFactory(self.conf['voice_factory'])
+            self.discord = DiscordBot(messager=self.messager, voice=self.voice)
 
     # Message factory
     #def __message_factory_injection(self):
