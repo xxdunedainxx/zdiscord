@@ -1,6 +1,7 @@
 from zdiscord.service.integration.chat.IChatClient import IChatClient
 from zdiscord.service.messaging.MessageFactory import MessageFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
+from zdiscord.service.integration.chat.discord.voice.DiscordVoice import DiscordVoice
 import requests
 import discord
 
@@ -11,8 +12,23 @@ class DiscordBot(discord.Client, IChatClient):
         discord.Client.__init__(self)
 
         self.__mf: MessageFactory = messager
+        self.__voice_client: DiscordVoice = None
+    # TODO : 'init_voice_client()'
 
     async def on_ready(self):
+        busters: discord.Guild = self.guilds[0]
+        print("getting channels")
+        channels: [discord.VoiceChannel] = busters.voice_channels
+        chan: discord.VoiceChannel = None
+        for ch in channels:
+            print("checking channel...")
+            if ch.name == 'Team Rheem':
+                chan = ch
+                break
+
+        self.__voice_client = DiscordVoice(bot=self)
+        await self.__voice_client.join(ctx=busters, channel=chan)
+
         print(f"Logged on as {self.user}")
         self._logger.info(f"Logged on as {self.user}")
 
@@ -46,3 +62,11 @@ class DiscordBot(discord.Client, IChatClient):
         else:
             self._logger.info("not mentioned. Skipping")
             print("not mentioned. Skipping")
+
+    # TODO 'onjoin' python config
+    async def on_voice_state_update(self, member, before, after):
+        if member.name == self.user or member.bot is True:
+            return
+        if after.channel != None:
+            busters: discord.Guild = self.guilds[0]
+            await self.__voice_client.stream(ctx=busters, url="https://www.youtube.com/embed/kYXRfwXfz5A")  # "https://youtu.be/EBudj01e9OY")
