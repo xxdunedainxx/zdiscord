@@ -23,3 +23,4 @@ if __name__ == "__main__":
         main_log.error(f"CRITICAL ERROR IN MAIN APP!!! {errorStackTrace(e)}")
         exit(-1)
 exit(0)
+
