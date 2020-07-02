@@ -1,5 +1,4 @@
 from zdiscord.service.Service import Service
-from zdiscord.service.Service import Service
 import json
 from typing import Any
 
@@ -57,27 +56,25 @@ class MessageFactory(Service):
                 fallBack=conf[c]['fallback'] if 'fallback' in conf[c].keys() else None,
                 type=conf[c]['type'],
                 main=eval(conf[c]['main']) if 'main' in conf[c].keys() else None,
-                arg= conf[c]['arg'] if 'arg' in conf[c].keys() else '',
+                arg=conf[c]['arg'] if 'arg' in conf[c].keys() else '',
                 syncMsg=conf[c]['syncMsg'] if 'syncMsg' in conf[c].keys() else None,
             )
 
         self._logger.info("init message config")
 
-    def send_await_msg(self, msg: str) -> str:
-        cmd = msg.split(' ')[0]
+    def send_await_msg(self,cmd: str, msg: str) -> str:
         if cmd in self.__MSG_CONFIGS.keys():
             return self.__MSG_CONFIGS[cmd].sync_msg
         else:
             return None
 
-    def process_response(self, msg: str) -> [str]:
-        cmd = msg.split(' ')[0]
+    def process_response(self,cmd: str, msg: str) -> [str]:
         # TODO Contains vs cmd logic
         if cmd in self.__MSG_CONFIGS.keys():
 
             if self.__MSG_CONFIGS[cmd].type == 'lambda':
                 # assume method if not a string
-                return self.__MSG_CONFIGS[cmd].main(msg.replace(f"{cmd} ", ''))
+                return self.__MSG_CONFIGS[cmd].main(msg)
             elif self.__MSG_CONFIGS[cmd].type == 'static_method':
                 return self.__MSG_CONFIGS[cmd].main(self.__MSG_CONFIGS[cmd].arg)
             # plain string response: ex: 'ping' --> resp 'pong'

@@ -3,6 +3,7 @@
     "token" : "*****"
   },
   "message_factory" : "./zdiscord/conf.json",
+  "voice_factory" : "./zdiscord/vf.json",
   "giphy" : {
     "url": "https://api.giphy.com/v1/gifs",
     "token" : "*****"

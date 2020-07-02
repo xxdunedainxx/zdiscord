@@ -3,6 +3,7 @@ from zdiscord.service.integration.giphy.Giphy import Giphy
 from zdiscord.service.integration.alphav.AlphaV import AlphaV
 from zdiscord.service.integration.chat.discord.DiscordClient import DiscordBot
 from zdiscord.service.messaging.MessageFactory import MessageFactory
+from zdiscord.service.messaging.VoiceFactory import VoiceFactory
 from zdiscord.util.logging.LogFactory import LogFactory
 
 import json
@@ -12,7 +13,7 @@ import json
 
 class App:
 
-    def __init__(self, config_path: str, buildAndRun: bool = True):
+    def __init__(self, config_path: str, buildAndRun: bool = False):
         self.conf: dict = {}
 
         # Main classes
@@ -27,9 +28,11 @@ class App:
         self.ingest_config(conf=config_path)
         #self.__message_factory_injection()
 
-        # TODO more generic interface for running chat
         if buildAndRun:
-            self.discord.run(self.conf['chat']['token'])
+            self.run()
+
+    def run(self):
+        self.discord.run(self.conf['chat']['token'])
 
     # ingest config
     def ingest_config(self, conf: str):
@@ -40,9 +43,9 @@ class App:
     # object creation
     def create_objects(self):
         if 'log' in self.conf.keys():
-            # TODO : set log level here?
-            # TODO : logfile enabled? if not dump to main.log?
             LogFactory.log_dir = self.conf['log']['log_dir'] if 'log_dir' in self.conf['log'].keys() else LogFactory.log_dir
+            LogFactory.log_level = self.conf['log']['log_level'] if 'log_level' in self.conf['log'].keys() else LogFactory.log_level
+            LogFactory.log_stdout = self.conf['log']['log_stdout'] if 'log_stdout' in self.conf['log'].keys() else LogFactory.log_stdout
 
         # TODO : default giphy
         if 'giphy' in self.conf.keys():
@@ -59,7 +62,8 @@ class App:
         else:
             # TODO generic service config
             self.messager = MessageFactory(self.conf['message_factory'], servicesRefeence={'giphy' : self.giphy, 'weather' : self.weather, 'alphav': self.alphav})
-            self.discord = DiscordBot(messager=self.messager)
+            self.voice = VoiceFactory(self.conf['voice_factory'])
+            self.discord = DiscordBot(messager=self.messager, voice=self.voice)
 
     # Message factory
     #def __message_factory_injection(self):
