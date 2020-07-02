@@ -26,7 +26,7 @@ AND
 """
 
 class MessageConfig:
-    def __init__(self, userMsg: str, responseMsg: str, type, main: Any = None, fallBack = None, arg: str = '', syncMsg: str = None):
+    def __init__(self, userMsg: str, responseMsg: str, type, main: Any = None, fallBack = None, arg: str = '', syncMsg: str = None,description: str = None, example: str = None ):
         self.umsg = userMsg
         self.rmsg = responseMsg
         self.main = main
@@ -34,6 +34,8 @@ class MessageConfig:
         self.type=type
         self.arg = arg
         self.sync_msg: str = syncMsg
+        self.description = description
+        self.example = example
 
 
 class MessageFactory(Service):
@@ -58,9 +60,14 @@ class MessageFactory(Service):
                 main=eval(conf[c]['main']) if 'main' in conf[c].keys() else None,
                 arg=conf[c]['arg'] if 'arg' in conf[c].keys() else '',
                 syncMsg=conf[c]['syncMsg'] if 'syncMsg' in conf[c].keys() else None,
+                description=conf[c]['description'] if 'description' in conf[c].keys() else None,
+                example=conf[c]['example'] if 'example' in conf[c].keys() else None,
             )
 
         self._logger.info("init message config")
+
+    def fetch_config(self) -> dict:
+        return self.__MSG_CONFIGS
 
     def send_await_msg(self,cmd: str, msg: str) -> str:
         if cmd in self.__MSG_CONFIGS.keys():

@@ -22,6 +22,7 @@ class DiscordBot(discord.Client, IChatClient):
         self.__HARD_CODED_ROUTINES: dict = {
             'connect': self.connect_voice_channel_routine,
             'disconnect': self.disconnect_voice,
+            'help' : self.help_msg,
         }
     # TODO : 'init_voice_client()'
 
@@ -52,7 +53,7 @@ class DiscordBot(discord.Client, IChatClient):
             await self.__voice_client.stream(ctx=busters, url=self.__vf.fetch_stream_link())
     async def process_msg(self, message: discord.Message):
         if self.is_at_mention(message.content):
-            parsed_msg: str = message.content.split(f"<@!{str(self.user.id)}>")[1].strip(' ')
+            parsed_msg: str = message.content.split(f"{self.get_at_mention()}")[1].strip(' ')
         elif type(message.channel) is discord.DMChannel:
             parsed_msg: str = message.content
         else:
@@ -65,6 +66,8 @@ class DiscordBot(discord.Client, IChatClient):
             return
         elif cmd in self.__HARD_CODED_ROUTINES.keys():
             await self.__HARD_CODED_ROUTINES[cmd](parsed_msg, message)
+        elif cmd not in self.__mf.fetch_config().keys():
+            await message.channel.send(f"{self.__mf.fetch_config()['default'].rmsg}\n\n Please type \'{self.get_at_mention()} help\' for more information on how to properly utilize my functions.")
         else:
             pre_process_msg: str = self.__mf.send_await_msg(cmd=cmd, msg=parsed_msg)
             if pre_process_msg is not None:
@@ -74,7 +77,7 @@ class DiscordBot(discord.Client, IChatClient):
     def parse_cmd(self, message: discord.Message) -> str:
         try:
             if self.is_at_mention(msg=message.content):
-                message.content=message.content.replace(f"<@!{str(self.user.id)}> ", '')
+                message.content=message.content.replace(f"{self.get_at_mention()} ", '')
 
             if ' ' in message.content:
                 return message.content.split(' ')[0]
@@ -89,8 +92,11 @@ class DiscordBot(discord.Client, IChatClient):
         except Exception as e:
             return 'default'
 
+    def get_at_mention(self) -> str:
+        return f"<@!{str(self.user.id)}>"
+
     def is_at_mention(self, msg: str) -> bool:
-        return f"<@!{str(self.user.id)}> " in msg
+        return f"{self.get_at_mention()} " in msg
 
     async def connect_voice_channel_routine(self, channel: str, message: discord.Message):
         print("request to join channel")
@@ -112,6 +118,24 @@ class DiscordBot(discord.Client, IChatClient):
             self.__current_voice_channel = None
         else:
             await message.channel.send(f"Not currently connected to a voice channel.")
+
+    async def help_msg(self, no_op, message: discord.Message):
+        self._logger.info(f"User \'{message.author.name}\' does not know what to do :(")
+
+        help_msg_builder: str = 'See the below supported commands and their usage:\n'
+        message_config: dict = self.__mf.fetch_config()
+        for msg in message_config.keys():
+            if msg == 'default':
+                continue
+            elif message_config[msg].description is not None and message_config[msg].example is not None:
+                help_msg_builder+=f"\n--- {msg}  ---\n"
+                help_msg_builder+=f"Description: {message_config[msg].description}\n"
+                help_msg_builder+=f"Example Usage: {message_config[msg].example}\n"
+
+        help_msg_builder+=f"\nNote: for channels you must '@' mention the bot to get any of the above commands to work. For example \'{self.get_at_mention()} ping\'\n"
+        help_msg_builder+="If you direct message the bot, you do not have to '@' mention the bot."
+
+        await message.channel.send(help_msg_builder)
 
     def get_voice_channel(self, channel: str) -> discord.VoiceChannel:
         busters: discord.Guild = self.guilds[0]
