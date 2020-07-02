@@ -92,3 +92,9 @@ class DiscordVoice(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+
+    async def leave(self, ctx):
+        """leave a voice channel"""
+
+        if ctx.voice_client is not None:
+            return await ctx.voice_client.disconnect()

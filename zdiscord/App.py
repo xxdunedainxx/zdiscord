@@ -13,7 +13,7 @@ import json
 
 class App:
 
-    def __init__(self, config_path: str, buildAndRun: bool = True):
+    def __init__(self, config_path: str, buildAndRun: bool = False):
         self.conf: dict = {}
 
         # Main classes
@@ -28,9 +28,11 @@ class App:
         self.ingest_config(conf=config_path)
         #self.__message_factory_injection()
 
-        # TODO more generic interface for running chat
         if buildAndRun:
-            self.discord.run(self.conf['chat']['token'])
+            self.run()
+
+    def run(self):
+        self.discord.run(self.conf['chat']['token'])
 
     # ingest config
     def ingest_config(self, conf: str):
@@ -41,9 +43,9 @@ class App:
     # object creation
     def create_objects(self):
         if 'log' in self.conf.keys():
-            # TODO : set log level here?
-            # TODO : logfile enabled? if not dump to main.log?
             LogFactory.log_dir = self.conf['log']['log_dir'] if 'log_dir' in self.conf['log'].keys() else LogFactory.log_dir
+            LogFactory.log_level = self.conf['log']['log_level'] if 'log_level' in self.conf['log'].keys() else LogFactory.log_level
+            LogFactory.log_stdout = self.conf['log']['log_stdout'] if 'log_stdout' in self.conf['log'].keys() else LogFactory.log_stdout
 
         # TODO : default giphy
         if 'giphy' in self.conf.keys():

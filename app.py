@@ -12,13 +12,12 @@ from zdiscord.App import App
 # TODO :Error handling for uneeded things like voice factory creation
 # https://stackoverflow.com/questions/42999961/ffmpeg-binary-not-found-python
 
-app = App(config_path="./zdiscord/app.json")
-
 if __name__ == "__main__":
     try:
+        app = App(config_path="./zdiscord/app.json")
         main_log=LogFactory.get_logger(logName="main")
         main_log.info('Init main')
-        app = App(config_path="./zdiscord/app.json")
+        app.run()
     except Exception as e:
         main_log.error(f"CRITICAL ERROR IN MAIN APP!!! {errorStackTrace(e)}")
         exit(-1)

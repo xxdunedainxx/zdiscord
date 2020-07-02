@@ -1,5 +1,6 @@
 from zdiscord.service.Service import Service
 import json
+import random
 from typing import Any
 
 class VoiceFactory(Service):
@@ -12,7 +13,11 @@ class VoiceFactory(Service):
     def __init_config(self, confLocation: str):
         conf: {} = json.load(open(confLocation))
 
-        self.__VOICE_CONFIGS['voice_channel'] = conf['voice_channel'] if 'voice_channel' in conf.keys() else {'channel_to_join': 'Team Rheem', 'stream_link': 'https://www.youtube.com/embed/kYXRfwXfz5A'}
-        self.channel = self.__VOICE_CONFIGS['voice_channel']['channel_to_join']
-        self.stream_link = self.__VOICE_CONFIGS['voice_channel']['stream_link']
+        self.__VOICE_CONFIGS = conf['voice'] if 'voice' in conf.keys() else {'default' : {'channel_to_join': 'Team Rheem', 'stream_link': 'https://www.youtube.com/embed/kYXRfwXfz5A'}}
         self._logger.info("init voice config")
+
+    def fetch_stream_link(self) -> str:
+        if 'rando' in self.__VOICE_CONFIGS.keys():
+            return self.__VOICE_CONFIGS['rando'][random.randint(0, len(self.__VOICE_CONFIGS['rando']))]['stream_link']
+        else:
+            return self.__VOICE_CONFIGS['default']['stream_link']
