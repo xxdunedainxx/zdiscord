@@ -17,7 +17,7 @@ if __name__ == "__main__":
         app = App(config_path="./zdiscord/app.json")
         main_log=LogFactory.get_logger(logName="main")
         main_log.info('Init main')
-        app.run()
+        app.run_wrapper(main_log)
     except Exception as e:
         main_log.error(f"CRITICAL ERROR IN MAIN APP!!! {errorStackTrace(e)}")
         exit(-1)

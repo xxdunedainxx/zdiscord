@@ -1,3 +1,5 @@
+import logging
+
 from zdiscord.service.integration.weather.Weather import Weather
 from zdiscord.service.integration.giphy.Giphy import Giphy
 from zdiscord.service.integration.alphav.AlphaV import AlphaV
@@ -5,6 +7,7 @@ from zdiscord.service.integration.chat.discord.DiscordClient import DiscordBot
 from zdiscord.service.messaging.MessageFactory import MessageFactory
 from zdiscord.service.messaging.VoiceFactory import VoiceFactory
 from zdiscord.util.logging.LogFactory import LogFactory
+from zdiscord.util.error.ErrorFactory import errorStackTrace
 
 import json
 
@@ -15,6 +18,7 @@ class App:
 
     def __init__(self, config_path: str, buildAndRun: bool = False):
         self.conf: dict = {}
+        self.crash_restarts: int = 3
 
         # Main classes
         self.discord: DiscordBot = None
@@ -31,13 +35,23 @@ class App:
         if buildAndRun:
             self.run()
 
+    def run_wrapper(self, logger: logging._loggerClass):
+        while self.crash_restarts > 0:
+            try:
+                logger.info(f"Running app w/ restarts: {self.crash_restarts}")
+                self.run()
+            except Exception as e:
+                logger.error(f"Serious problem occured: {errorStackTrace(e)}")
+                self.crash_restarts-=1
+        raise Exception(f"total crashes reached!")
+
     def run(self):
         self.discord.run(self.conf['chat']['token'])
 
     # ingest config
     def ingest_config(self, conf: str):
         self.conf = json.load(open(conf))
-
+        self.crash_restarts = self.conf['crashRestarts'] if 'crashRestarts' in self.conf.keys() else self.crash_restarts
         self.create_objects()
 
     # object creation
