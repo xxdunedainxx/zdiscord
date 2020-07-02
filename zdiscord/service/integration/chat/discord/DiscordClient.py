@@ -27,7 +27,7 @@ class DiscordBot(discord.Client, IChatClient):
     # TODO : 'init_voice_client()'
 
     async def on_ready(self):
-        self.__voice_client = DiscordVoice(bot=self)
+        self.__voice_client = DiscordVoice(bot=self, ffmpeg=self.__vf.ffmpeg)
         print(f"Logged on as {self.user}")
         self._logger.info(f"Logged on as {self.user}")
 
@@ -99,6 +99,10 @@ class DiscordBot(discord.Client, IChatClient):
         return f"{self.get_at_mention()} " in msg
 
     async def connect_voice_channel_routine(self, channel: str, message: discord.Message):
+        if self.__voice_client is None:
+            self._logger.warn("Voice client is not configured, sending msg back to user..")
+            message.channel.send("I am not configured properly to use voice!!")
+
         print("request to join channel")
         busters: discord.Guild = self.guilds[0]
         channel_to_join: discord.VoiceChannel = self.get_voice_channel(channel)

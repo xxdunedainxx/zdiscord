@@ -48,11 +48,13 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options, executable="C:\\Users\\zach\\Documents\\ffmpeg\\ffmpeg-20200615-9d80f3e-win64-static\\bin\\ffmpeg.exe"), data=data)
-
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options, executable=DiscordVoice.ffmpeg_binary), data=data)
 
 class DiscordVoice(commands.Cog):
-    def __init__(self, bot):
+    ffmpeg_binary: str = ''
+
+    def __init__(self, bot, ffmpeg: str):
+        DiscordVoice.ffmpeg_binary = ffmpeg
         self.bot = bot
 
     async def join(self, ctx, *, channel: discord.VoiceChannel):
