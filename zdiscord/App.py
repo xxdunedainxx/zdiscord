@@ -76,7 +76,7 @@ class App:
         else:
             # TODO generic service config
             self.messager = MessageFactory(self.conf['message_factory'], servicesRefeence={'giphy' : self.giphy, 'weather' : self.weather, 'alphav': self.alphav})
-            self.voice = VoiceFactory(self.conf['voice_factory'])
+            self.voice = VoiceFactory(self.conf['voice_factory']['conf'], self.conf['voice_factory']['ffmpeg']) if 'voice_factory' in self.conf.keys() and 'ffmpeg' in self.conf['voice_factory'].keys() else None # voice is optional, requires ffmpeg and voice config
             self.discord = DiscordBot(messager=self.messager, voice=self.voice)
 
     # Message factory

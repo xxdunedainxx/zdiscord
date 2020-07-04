@@ -19,6 +19,7 @@ if __name__ == "__main__":
         main_log.info('Init main')
         app.run_wrapper(main_log)
     except Exception as e:
+        print(errorStackTrace(e))
         main_log.error(f"CRITICAL ERROR IN MAIN APP!!! {errorStackTrace(e)}")
         exit(-1)
 exit(0)
