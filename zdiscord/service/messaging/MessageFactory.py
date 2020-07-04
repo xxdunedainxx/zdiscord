@@ -1,4 +1,5 @@
 from zdiscord.service.Service import Service
+from zdiscord.util.error.ErrorFactory import errorStackTrace
 import json
 from typing import Any
 
@@ -26,7 +27,7 @@ AND
 """
 
 class MessageConfig:
-    def __init__(self, userMsg: str, responseMsg: str, type, main: Any = None, fallBack = None, arg: str = '', syncMsg: str = None,description: str = None, example: str = None ):
+    def __init__(self, userMsg: str, responseMsg: str, type, main: Any = None, fallBack = None, arg: str = '', syncMsg: str = None,description: str = None, example: str = None, cmdRetries: int = 3 ):
         self.umsg = userMsg
         self.rmsg = responseMsg
         self.main = main
@@ -36,6 +37,7 @@ class MessageConfig:
         self.sync_msg: str = syncMsg
         self.description = description
         self.example = example
+        self.retries = cmdRetries
 
 
 class MessageFactory(Service):
@@ -62,6 +64,7 @@ class MessageFactory(Service):
                 syncMsg=conf[c]['syncMsg'] if 'syncMsg' in conf[c].keys() else None,
                 description=conf[c]['description'] if 'description' in conf[c].keys() else None,
                 example=conf[c]['example'] if 'example' in conf[c].keys() else None,
+                cmdRetries=conf[c]['retries'] if 'retries' in conf[c].keys() else 3,
             )
 
         self._logger.info("init message config")
@@ -80,10 +83,23 @@ class MessageFactory(Service):
         if cmd in self.__MSG_CONFIGS.keys():
 
             if self.__MSG_CONFIGS[cmd].type == 'lambda':
-                # assume method if not a string
-                return self.__MSG_CONFIGS[cmd].main(msg)
+                retries = self.__MSG_CONFIGS[cmd].retries
+                while retries > 0:
+                    try:
+                        # assume method if not a string
+                        return self.__MSG_CONFIGS[cmd].main(msg)
+                    except Exception as e:
+                        self._logger.error(f"Fatal while processing main for {cmd}: {errorStackTrace(e)}")
+                        retries-=1
             elif self.__MSG_CONFIGS[cmd].type == 'static_method':
-                return self.__MSG_CONFIGS[cmd].main(self.__MSG_CONFIGS[cmd].arg)
+                retries = self.__MSG_CONFIGS[cmd].retries
+                while retries > 0:
+                    try:
+                        # assume method if not a string
+                        return self.__MSG_CONFIGS[cmd].main(self.__MSG_CONFIGS[cmd].arg)
+                    except Exception as e:
+                        self._logger.error(f"Fatal while processing main for {cmd}: {errorStackTrace(e)}")
+                        retries-=1
             # plain string response: ex: 'ping' --> resp 'pong'
             else:
                 return self.__MSG_CONFIGS[cmd].rmsg
