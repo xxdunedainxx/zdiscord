@@ -62,7 +62,7 @@ class DiscordBot(discord.Client, IChatClient):
         # TODO do pre process msg better
         cmd: str = self.parse_cmd(message=message)
         parsed_msg: str = self.parse_msg(cmd, message.content)
-        if cmd is '':
+        if cmd == '':
             return
         elif cmd in self.__HARD_CODED_ROUTINES.keys():
             await self.__HARD_CODED_ROUTINES[cmd](parsed_msg, message)
