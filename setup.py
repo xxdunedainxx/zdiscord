@@ -22,7 +22,7 @@ setup(
     long_description='',
     long_description_content_type="text/markdown",
     url="https://github.com/xxdunedainxx/zdiscord",
-    install_requires=["requests", "discord"],
+    install_requires=["requests", "discord", "youtube_dl", "discord.py[voice]"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
