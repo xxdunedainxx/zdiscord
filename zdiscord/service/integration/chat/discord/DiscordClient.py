@@ -20,9 +20,19 @@ class DiscordBot(discord.Client, IChatClient):
         self.__current_voice_channel: discord.VoiceChannel = None
 
         self.__HARD_CODED_ROUTINES: dict = {
-            'connect': self.connect_voice_channel_routine,
-            'disconnect': self.disconnect_voice,
-            'help' : self.help_msg,
+            'connect': {
+                'description': 'Connect the voice bot to a voice channel. It will play a random video once it joins',
+                'example': 'connect Team Rheem',
+                'method': self.connect_voice_channel_routine,
+            },
+            'disconnect': {
+                'description': 'disconnects bot from voice',
+                'example': 'disconnect',
+                'method':   self.disconnect_voice,
+            },
+            'help': {
+                'method': self.help_msg
+            },
         }
     # TODO : 'init_voice_client()'
 
@@ -65,7 +75,7 @@ class DiscordBot(discord.Client, IChatClient):
         if cmd is '':
             return
         elif cmd in self.__HARD_CODED_ROUTINES.keys():
-            await self.__HARD_CODED_ROUTINES[cmd](parsed_msg, message)
+            await self.__HARD_CODED_ROUTINES[cmd]['method'](parsed_msg, message)
         elif cmd not in self.__mf.fetch_config().keys():
             await message.channel.send(f"{self.__mf.fetch_config()['default'].rmsg}\n\n Please type \'{self.get_at_mention()} help\' for more information on how to properly utilize my functions.")
         else:
@@ -128,6 +138,9 @@ class DiscordBot(discord.Client, IChatClient):
 
         help_msg_builder: str = 'See the below supported commands and their usage:\n'
         message_config: dict = self.__mf.fetch_config()
+
+        help_msg_builder+='\nCUSTOM BUILT COMMANDS:\n'
+
         for msg in message_config.keys():
             if msg == 'default':
                 continue
@@ -135,6 +148,15 @@ class DiscordBot(discord.Client, IChatClient):
                 help_msg_builder+=f"\n--- {msg}  ---\n"
                 help_msg_builder+=f"Description: {message_config[msg].description}\n"
                 help_msg_builder+=f"Example Usage: {message_config[msg].example}\n"
+
+        help_msg_builder += '\nPRE BUILT COMMANDS:\n'
+        for cmd in self.__HARD_CODED_ROUTINES.keys():
+            if cmd == 'help':
+                continue
+            else:
+                help_msg_builder += f"\n--- {cmd}  ---\n"
+                help_msg_builder += f"Description: {self.__HARD_CODED_ROUTINES[cmd]['description']}\n"
+                help_msg_builder += f"Example Usage: {self.__HARD_CODED_ROUTINES[cmd]['example']}\n"
 
         help_msg_builder+=f"\nNote: for channels you must '@' mention the bot to get any of the above commands to work. For example \'{self.get_at_mention()} ping\'\n"
         help_msg_builder+="If you direct message the bot, you do not have to '@' mention the bot."
