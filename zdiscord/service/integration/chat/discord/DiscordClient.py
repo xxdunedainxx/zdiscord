@@ -161,6 +161,8 @@ class DiscordBot(discord.Client, IChatClient):
         help_msg_builder+=f"\nNote: for channels you must '@' mention the bot to get any of the above commands to work. For example \'{self.get_at_mention()} ping\'\n"
         help_msg_builder+="If you direct message the bot, you do not have to '@' mention the bot."
 
+        await message.channel.send(help_msg_builder)
+
 
     def get_voice_channel(self, channel: str) -> discord.VoiceChannel:
         busters: discord.Guild = self.guilds[0]
