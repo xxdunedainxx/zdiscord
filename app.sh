@@ -2,6 +2,8 @@
 
 source /home/zdiscord/.bash_profile
 
+cd "${APP_ROOT_DIR}"
+
 source "${APP_ROOT_DIR}/env/bin/activate"
 
 which python
