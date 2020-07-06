@@ -3,6 +3,7 @@ from zdiscord.service.messaging.MessageFactory import MessageFactory
 from zdiscord.service.messaging.VoiceFactory import VoiceFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.service.integration.chat.discord.voice.DiscordVoice import DiscordVoice
+from zdiscord.service.integration.chat.discord.DiscordCommandMiddleware import DiscordCommandMiddleware
 import requests
 import discord
 
@@ -15,9 +16,11 @@ class DiscordBot(discord.Client, IChatClient):
         discord.Client.__init__(self)
 
         self.__mf: MessageFactory = messager
+        self.__cm: DiscordCommandMiddleware = DiscordCommandMiddleware(confLocation=self.__mf.RAW_CONFIG_LOCATION)
+        self.__mf.COMMAND_FACTORY = self.__cm
         self.__vf: VoiceFactory = voice
         self.__voice_client: DiscordVoice = None
-        self.__current_voice_channel: discord.VoiceChannel = None
+        self.__current_voice_channel: discord.VoiceChannel = None # TODO get currnet voice channel dynamically ??
 
         self.__HARD_CODED_ROUTINES: dict = {
             'connect': {
@@ -34,11 +37,9 @@ class DiscordBot(discord.Client, IChatClient):
                 'method': self.help_msg
             },
         }
-    # TODO : 'init_voice_client()'
 
     async def on_ready(self):
         self.__voice_client = DiscordVoice(bot=self, ffmpeg=self.__vf.ffmpeg)
-        print(f"Logged on as {self.user}")
         self._logger.info(f"Logged on as {self.user}")
 
     async def on_message(self, message: discord.Message):
@@ -46,7 +47,6 @@ class DiscordBot(discord.Client, IChatClient):
         # don't respond to ourselves
         if message.author == self.user:
             return
-        #else:
         else:
             try:
                 await self.process_msg(message)
@@ -61,7 +61,9 @@ class DiscordBot(discord.Client, IChatClient):
         else:
             busters: discord.Guild = self.guilds[0]
             await self.__voice_client.stream(ctx=busters, url=self.__vf.fetch_stream_link())
+
     async def process_msg(self, message: discord.Message):
+        # TODO maybe do some of the message parsing in message factory???
         if self.is_at_mention(message.content):
             parsed_msg: str = message.content.split(f"{self.get_at_mention()}")[1].strip(' ')
         elif type(message.channel) is discord.DMChannel:
@@ -84,6 +86,7 @@ class DiscordBot(discord.Client, IChatClient):
                 await message.channel.send(pre_process_msg)
             await message.channel.send(self.__mf.process_response(cmd=cmd, msg=parsed_msg))
 
+    # TODO maybe do some of the message parsing in message factory???
     def parse_cmd(self, message: discord.Message) -> str:
         try:
             if self.is_at_mention(msg=message.content):
@@ -96,6 +99,7 @@ class DiscordBot(discord.Client, IChatClient):
         except Exception as e:
             return 'default'
 
+    # TODO maybe do some of the message parsing in message factory???
     def parse_msg(self,cmd: str, msg: str) -> str:
         try:
             return msg.replace(f"{cmd} ",'')
@@ -133,6 +137,7 @@ class DiscordBot(discord.Client, IChatClient):
         else:
             await message.channel.send(f"Not currently connected to a voice channel.")
 
+    # TODO maybe do some of the message parsing AND BUILDING in message factory???
     async def help_msg(self, no_op, message: discord.Message):
         self._logger.info(f"User \'{message.author.name}\' does not know what to do :(")
 

@@ -1,5 +1,6 @@
 import logging
 
+from zdiscord.service.ServiceFactory import  ServiceFactory
 from zdiscord.service.integration.weather.Weather import Weather
 from zdiscord.service.integration.giphy.Giphy import Giphy
 from zdiscord.service.integration.alphav.AlphaV import AlphaV
@@ -64,18 +65,21 @@ class App:
         # TODO : default giphy
         if 'giphy' in self.conf.keys():
             self.giphy=Giphy(url=self.conf['giphy']['url'], token=self.conf['giphy']['token'])
+            ServiceFactory.SERVICES['giphy'] = self.giphy
 
         if 'weather' in self.conf.keys():
             self.weather=Weather(url=self.conf['weather']['url'], token=self.conf['weather']['token'])
+            ServiceFactory.SERVICES['weather'] = self.weather
 
         if 'alphav' in self.conf.keys():
             self.alphav=AlphaV(url=self.conf['alphav']['url'], token=self.conf['alphav']['token'])
+            ServiceFactory.SERVICES['alphav'] = self.alphav
 
         if 'chat' not in self.conf.keys() or 'message_factory' not in self.conf.keys():
             raise Exception('\'chat\' IS REQUIRED FOR THIS BOT')
         else:
             # TODO generic service config
-            self.messager = MessageFactory(self.conf['message_factory'], servicesRefeence={'giphy' : self.giphy, 'weather' : self.weather, 'alphav': self.alphav})
+            self.messager = MessageFactory(self.conf['message_factory'])
             self.voice = VoiceFactory(self.conf['voice_factory']['conf'], self.conf['voice_factory']['ffmpeg']) if 'voice_factory' in self.conf.keys() and 'ffmpeg' in self.conf['voice_factory'].keys() else None # voice is optional, requires ffmpeg and voice config
             self.discord = DiscordBot(messager=self.messager, voice=self.voice)
 

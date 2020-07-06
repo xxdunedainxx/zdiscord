@@ -1,4 +1,7 @@
 from zdiscord.service.Service import Service
+from zdiscord.service.messaging.CommandFactory import CommandFactory
+from zdiscord.service.ServiceFactory import ServiceFactory
+from zdiscord.service.messaging.CommandFactory import COMMANDS
 import json
 from typing import Any
 
@@ -41,15 +44,23 @@ class MessageConfig:
 class MessageFactory(Service):
     FALL_BACK_VALUE: str = 'Failed to process response'
 
-    def __init__(self, confLocation: str, servicesRefeence: {Service}):
+    def __init__(self, confLocation: str):
         super().__init__(name='MessageFactory')
         self._logger.info("Start up message factory...")
+        self.RAW_CONFIG: {} = {}
+        self.RAW_CONFIG_LOCATION: str = ''
+        self.__CMD_CONFIGS: {} = {}
         self.__MSG_CONFIGS: {} = {}
-        self.services_ref = servicesRefeence
+        self.services_ref = ServiceFactory.SERVICES
         self.__init_config(confLocation)
+
+        # Must be specified by client middleware
+        self.COMMAND_FACTORY: CommandFactory = None
 
     def __init_config(self, confLocation: str):
         conf: {} = json.load(open(confLocation))
+        self.RAW_CONFIG_LOCATION = confLocation
+        self.RAW_CONFIG = conf
 
         for c in conf.keys():
             self.__MSG_CONFIGS[c] = MessageConfig(
@@ -69,14 +80,7 @@ class MessageFactory(Service):
     def fetch_config(self) -> dict:
         return self.__MSG_CONFIGS
 
-    def send_await_msg(self,cmd: str, msg: str) -> str:
-        if cmd in self.__MSG_CONFIGS.keys():
-            return self.__MSG_CONFIGS[cmd].sync_msg
-        else:
-            return None
-
     def process_response(self,cmd: str, msg: str) -> [str]:
-        # TODO Contains vs cmd logic
         if cmd in self.__MSG_CONFIGS.keys():
 
             if self.__MSG_CONFIGS[cmd].type == 'lambda':
@@ -93,13 +97,6 @@ class MessageFactory(Service):
             self._logger.warn("FAILED TO PROCESS ANY OF THE MESSAGES PROVIDED IN CONFIG")
             return MessageFactory.FALL_BACK_VALUE
 
-    #def add_config(self,key: str, value: Any):
-    #    if key not in self.__MSG_CONFIGS.keys():
-    #        self.__MSG_CONFIGS[key] = value
-    #    else:
-    #        # TODO: custom exception in error factory
-    #        raise Exception('NO CANT OVERRIDE')
-
-    # TODO Supported commands? Help command?
-
-    # TODO Help per config
+    # must be implemented by client specific logic!!
+    def process_msg(self, *args, **kwargs):
+        raise Exception('Must be overridden by client middleware!')
