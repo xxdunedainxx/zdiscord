@@ -1,8 +1,28 @@
 from zdiscord.service.messaging.MessageFactory import MessageFactory
+import discord
+
+class DiscordMessageParsed:
+
+    def __init__(self, command: str, message: str):
+        self.command: str = command
+        self.message: str = message
 
 class DiscordMessageMiddleware(MessageFactory):
     def __init__(self, confLocation: str):
         super().__init__(confLocation=confLocation)
+
+    def parse_message(self, message: discord.Message) -> DiscordMessageParsed:
+        if self.is_at_mention(message.content):
+            parsed_msg: str = message.content.split(f"{self.get_at_mention()}")[1].strip(' ')
+        elif type(message.channel) is discord.DMChannel:
+            parsed_msg: str = message.content
+        else:
+            return None
+        self._logger.info(parsed_msg)
+        cmd: str = self.parse_cmd(message=message)
+
+        return DiscordMessageParsed(cmd, parsed_msg)
+
 
     # TODO maybe do some of the message parsing in message factory???
     def parse_cmd(self, message: discord.Message) -> str:

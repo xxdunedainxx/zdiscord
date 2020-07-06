@@ -5,29 +5,6 @@ from zdiscord.service.messaging.CommandFactory import COMMANDS
 import json
 from typing import Any
 
-# TODO : more advanced msg config
-# TODO : intake message templates from files for more advanced messaging
-# Ex:
-"""
-'=============================\n\n༼ つ ◕_◕ ༽つ\n\nOMEED SUCKS ASS\n\n༼ つ ◕_◕ ༽つ\n\n============================='
-
-AND 
-
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⢰⣿⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣀⣀⣾⣿⣿⣿⣿
-⣿⣿⣿⣿⣿⡏⠉⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿
-⣿⣿⣿⣿⣿⣿⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠉⠁⠀⣿
-⣿⣿⣿⣿⣿⣿⣧⡀⠀⠀⠀⠀⠙⠿⠿⠿⠻⠿⠿⠟⠿⠛⠉⠀⠀⠀⠀⠀⣸⣿
-⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣴⣿⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⢰⣹⡆⠀⠀⠀⠀⠀⠀⣭⣷⠀⠀⠀⠸⣿⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠈⠉⠀⠀⠤⠄⠀⠀⠀⠉⠁⠀⠀⠀⠀⢿⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⢾⣿⣷⠀⠀⠀⠀⡠⠤⢄⠀⠀⠀⠠⣿⣿⣷⠀⢸⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⡀⠉⠀⠀⠀⠀⠀⢄⠀⢀⠀⠀⠀⠀⠉⠉⠁⠀⠀⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿
-"""
-
 class MessageConfig:
     def __init__(self, userMsg: str, responseMsg: str, type, main: Any = None, fallBack = None, arg: str = '', syncMsg: str = None,description: str = None, example: str = None ):
         self.umsg = userMsg
@@ -80,7 +57,7 @@ class MessageFactory(Service):
     def fetch_config(self) -> dict:
         return self.__MSG_CONFIGS
 
-    def process_response(self,cmd: str, msg: str) -> [str]:
+    def process_response(self,cmd: str, msg: str) -> str:
         if cmd in self.__MSG_CONFIGS.keys():
 
             if self.__MSG_CONFIGS[cmd].type == 'lambda':
@@ -97,6 +74,8 @@ class MessageFactory(Service):
             self._logger.warn("FAILED TO PROCESS ANY OF THE MESSAGES PROVIDED IN CONFIG")
             return MessageFactory.FALL_BACK_VALUE
 
-    # must be implemented by client specific logic!!
-    def process_msg(self, *args, **kwargs):
-        raise Exception('Must be overridden by client middleware!')
+    def parse_message(self, message: str) -> Any:
+        raise Exception('Must be defined in client specific middleware!')
+
+    def is_valid_message(self, message: str) -> bool:
+        return message in self.RAW_CONFIG.keys()

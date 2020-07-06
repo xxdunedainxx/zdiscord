@@ -56,7 +56,7 @@ class CommandFactory(Service):
         self._logger.info(f"Start up command factory... with module context {self.__module__}")
         self.services_ref = ServiceFactory.SERVICES
 
-    def process_command(self,command: str, context: Any):
+    def execute_cmd(self, command: str, *args, **kwargs):
         pass
 """
 getattr(module, class_name)
