@@ -27,13 +27,13 @@ class DiscordMiddleware(IChatMiddleware):
         self._logger.info("DiscordMiddleware initialized!")
 
     def run(self):
+        self._logger.info("In thread?")
         self._chat_client.run(self.__API_TOKEN)
 
 
     async def on_message(self, event: DiscordEvent):
         msg: discord.Message = event.context['message_object']
         await msg.channel.send('test!')
-
 
     async def event_subscriber(self, event: DiscordEvent):
         try:
