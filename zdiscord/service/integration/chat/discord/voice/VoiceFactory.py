@@ -20,6 +20,6 @@ class VoiceFactory(Service):
 
     def fetch_stream_link(self) -> str:
         if 'rando' in self.__VOICE_CONFIGS.keys():
-            return self.__VOICE_CONFIGS['rando'][random.randint(0, len(self.__VOICE_CONFIGS['rando']))]['stream_link']
+            return self.__VOICE_CONFIGS['rando'][random.randint(0, len(self.__VOICE_CONFIGS['rando']) - 1 )]['stream_link']
         else:
             return self.__VOICE_CONFIGS['default']['stream_link']
