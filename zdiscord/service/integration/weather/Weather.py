@@ -12,7 +12,7 @@ class Weather(IIntegration):
         weather_info: requests.Response = self.get_weather(query)
 
         if (weather_info.status_code != 200):
-            "there is no weather today :( \n (something went wrong)\nNOTE: You must submit your query something like: \'Town,State\'"
+            return "there is no weather today :( \n (something went wrong)\nNOTE: You must submit your query something like: \'Town,State\'"
         else:
             return self.format_weather(weather_info.json())
 
@@ -22,10 +22,11 @@ class Weather(IIntegration):
         for weather_descriptions in weatherResponse['weather']:
             weather_description += weather_descriptions['description']
 
-        return f"""Description: {weather_description}
-    Wind Speed: {str(weatherResponse['wind']['speed'])} mph
-    Temperature: {str(weatherResponse['main']['temp'])} °F
-    Humans say the temperature feels like.. {str(weatherResponse['main']['feels_like'])} °F"""
+        return (f"""Description: {weather_description}\n"""\
+                f"""Wind Speed: {str(weatherResponse['wind']['speed'])} mph\n"""\
+                f"""Temperature: {str(weatherResponse['main']['temp'])} °F\n"""\
+                f"""Humans say the temperature feels like.. {str(weatherResponse['main']['feels_like'])} °F"""
+        )
 
     def get_weather(self, query: str) -> requests.Response:
         url = f"{self.url}/weather?q={query}&APPID={self.__token}&units=imperial"

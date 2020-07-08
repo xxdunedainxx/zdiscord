@@ -1,12 +1,11 @@
 import logging
 
-from zdiscord.service.ServiceFactory import  ServiceFactory
+from zdiscord.service.ServiceFactory import ServiceFactory
 from zdiscord.service.integration.weather.Weather import Weather
 from zdiscord.service.integration.giphy.Giphy import Giphy
 from zdiscord.service.integration.alphav.AlphaV import AlphaV
-from zdiscord.service.integration.chat.discord.DiscordClient import DiscordBot
-from zdiscord.service.messaging.MessageFactory import MessageFactory
-from zdiscord.service.messaging.VoiceFactory import VoiceFactory
+from zdiscord.service.integration.chat.IChatMiddleware import IChatMiddleware
+from zdiscord.service.integration.chat.discord.DiscordMiddleware import DiscordMiddleware
 from zdiscord.util.logging.LogFactory import LogFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 
@@ -22,8 +21,7 @@ class App:
         self.crash_restarts: int = 3
 
         # Main classes
-        self.discord: DiscordBot = None
-        self.messager: MessageFactory = None
+        self.chat_middleware: IChatMiddleware = None
 
         # plugins
         self.giphy: Giphy = None
@@ -31,7 +29,6 @@ class App:
         self.alphav: AlphaV = None
 
         self.ingest_config(conf=config_path)
-        #self.__message_factory_injection()
 
         if buildAndRun:
             self.run()
@@ -47,7 +44,7 @@ class App:
         raise Exception(f"total crashes reached!")
 
     def run(self):
-        self.discord.run(self.conf['chat']['token'])
+        self.chat_middleware.run()
 
     # ingest config
     def ingest_config(self, conf: str):
@@ -78,15 +75,5 @@ class App:
         if 'chat' not in self.conf.keys() or 'message_factory' not in self.conf.keys():
             raise Exception('\'chat\' IS REQUIRED FOR THIS BOT')
         else:
-            # TODO generic service config
-            self.messager = MessageFactory(self.conf['message_factory'])
-            self.voice = VoiceFactory(self.conf['voice_factory']['conf'], self.conf['voice_factory']['ffmpeg']) if 'voice_factory' in self.conf.keys() and 'ffmpeg' in self.conf['voice_factory'].keys() else None # voice is optional, requires ffmpeg and voice config
-            self.discord = DiscordBot(messager=self.messager, voice=self.voice)
-
-    # Message factory
-    #def __message_factory_injection(self):
-    #    if self.giphy is not None:
-    #        self.messager.add_config(key='giphy', value=self.giphy.get_giphy)
-
-    #    if self.weather is not None:
-    #        self.messager.add_config(key='weather', value=self.weather.get_and_format)
+            #TODO generic service config
+            self.chat_middleware = eval(self.conf['chat']['platform'])(self.conf)

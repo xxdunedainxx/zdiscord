@@ -1,5 +1,7 @@
 from zdiscord.service.Service import Service
 from zdiscord.service.ServiceFactory import ServiceFactory
+from zdiscord.service.messaging.EventFactory import IEvent, EventConfig
+from zdiscord.service.integration.chat.discord.macros.General import help_msg
 import importlib
 import json
 from typing import Any
@@ -48,16 +50,50 @@ class StaticCommand:
 
 class CommandFactory(Service):
     # For dynamic command import to run via string
+    HELP_MSG: str
 
-
-    def __init__(self, confLocation: str):
-        super().__init__(name='CommandFactory')
+    def __init__(self, conf:{}):
+        super().__init__(name=self.__class__.__name__)
         self.COMMAND_IMPORTER = importlib.import_module(self.__module__)
         self._logger.info(f"Start up command factory... with module context {self.__module__}")
         self.services_ref = ServiceFactory.SERVICES
+        self._COMMAND_CONFIGS: {} = {}
+        self.__init_config(conf)
 
-    def execute_cmd(self, command: str, *args, **kwargs):
-        pass
+        self.__build_help_msg()
+
+
+    def __init_config(self, conf: {}):
+        for command_config in conf.keys():
+            self._COMMAND_CONFIGS[command_config] = getattr(self.COMMAND_IMPORTER, conf[command_config]['type'])(conf=conf[command_config]['conf'])
+
+        self._logger.info("init message config")
+        self._logger.info(f"Understood commands: {self._COMMAND_CONFIGS}")
+
+    def execute_cmd(self, event: IEvent, eventConfig: EventConfig):
+        self._COMMAND_CONFIGS[eventConfig.lookup].run(event)
+
+    def __build_help_msg(self) -> None:
+        help_msg_builder: str = 'See the below supported commands and their usage:\n'
+        help_msg_builder += '\nCUSTOM BUILT COMMANDS:\n'
+
+        for cmd in self._COMMAND_CONFIGS.keys():
+            if self._COMMAND_CONFIGS[cmd].description is not None and self._COMMAND_CONFIGS[cmd].example is not None and self._COMMAND_CONFIGS[cmd].command is not None:
+                help_msg_builder += f"\n--- {self._COMMAND_CONFIGS[cmd].command}  ---\n"
+                help_msg_builder += f"Description: {self._COMMAND_CONFIGS[cmd].description}\n"
+                help_msg_builder += f"Example Usage: {self._COMMAND_CONFIGS[cmd].example}\n"
+
+        #help_msg_builder += '\nPRE BUILT COMMANDS:\n'
+        #for cmd in self.__HARD_CODED_ROUTINES.keys():
+        #    if cmd == 'help':
+        #        continue
+        #    else:
+        #        help_msg_builder += f"\n--- {cmd}  ---\n"
+        #        help_msg_builder += f"Description: {self.__HARD_CODED_ROUTINES[cmd]['description']}\n"
+        #        help_msg_builder += f"Example Usage: {self.__HARD_CODED_ROUTINES[cmd]['example']}\n"
+
+        # Override value here
+        CommandFactory.HELP_MSG = help_msg_builder
 """
 getattr(module, class_name)
             if self.__MSG_CONFIGS[cmd].type == 'lambda':

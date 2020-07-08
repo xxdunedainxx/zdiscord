@@ -26,13 +26,11 @@ class AlphaV(IIntegration):
                 # Get most recent stocks
                 get_time_serie_data=get_time_serie_data[list(get_time_serie_data.keys())[0]]
                 print("got stocks..")
-                return f"""
-            --- {stock} STOCK INFO ---
-            stock info closed @ {get_time_serie_data['4. close']}
-            stock high: {get_time_serie_data['2. high']}
-            stock low: {get_time_serie_data['3. low']}
-            --- END STOCK INFO ---
-                """
+                return(f"""--- {stock} STOCK INFO ---\n"""\
+                    f"""stock info closed @ {get_time_serie_data['4. close']}\n"""\
+                    f"""stock high: {get_time_serie_data['2. high']}\n"""\
+                    f"""stock low: {get_time_serie_data['3. low']}\n""" \
+                    """--- END STOCK INFO ---""")
             else:
                 # TODO Default?
                 return f"Failed to get stock info for \'{stock}\'"

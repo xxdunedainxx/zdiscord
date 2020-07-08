@@ -1,3 +1,5 @@
+from zdiscord.service.integration.chat.discord.voice.VoiceFactory import VoiceFactory
+
 import asyncio
 
 import discord
@@ -53,9 +55,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class DiscordVoice(commands.Cog):
     ffmpeg_binary: str = ''
 
-    def __init__(self, bot, ffmpeg: str):
+    def __init__(self, bot, voiceFactory: VoiceFactory , ffmpeg: str):
         DiscordVoice.ffmpeg_binary = ffmpeg
+        self.current_voice_channel: discord.VoiceChannel = None
+        self.__vf: VoiceFactory = voiceFactory
         self.bot = bot
+
 
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """Joins a voice channel"""
@@ -100,3 +105,34 @@ class DiscordVoice(commands.Cog):
 
         if ctx.voice_client is not None:
             return await ctx.voice_client.disconnect()
+
+    async def random_audio(self):
+        busters: discord.Guild = self.bot.guilds[0]
+        await self.stream(ctx=busters, url=self.__vf.fetch_stream_link())
+
+    async def connect_voice_channel_routine(self, channel: str, message: discord.Message):
+        busters: discord.Guild = self.bot.guilds[0]
+        channel_to_join: discord.VoiceChannel = self.get_voice_channel(channel)
+        if channel_to_join:
+            self.current_voice_channel = channel_to_join
+            await self.join(ctx=busters, channel=channel_to_join)
+            await self.stream(ctx=busters, url=self.__vf.fetch_stream_link())
+        else:
+            await message.channel.send(f"Unable to join voice channel \"{channel}\"")
+
+    async def disconnect_voice(self):
+        busters: discord.Guild = self.bot.guilds[0]
+        if self.current_voice_channel:
+            await self.leave(busters)
+            self.current_voice_channel = None
+
+    def get_voice_channel(self, channel: str) -> discord.VoiceChannel:
+        busters: discord.Guild = self.bot.guilds[0]
+        print("getting channels")
+        channels: [discord.VoiceChannel] = busters.voice_channels
+        chan: discord.VoiceChannel = None
+        for ch in channels:
+            print("checking channel...")
+            if ch.name == channel:
+                return ch
+        return None
