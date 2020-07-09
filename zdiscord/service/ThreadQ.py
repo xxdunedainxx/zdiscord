@@ -1,21 +1,31 @@
-import redis
+from zdiscord.util.general.Redis import RedisConnection, RedisConfig
 # C:\Program Files\redis-2.4.5-win32-win64\64bit
 import json
+
+
 class ThreadQueue:
-    reddis_connection = redis.Redis(host='localhost', port=6379, db='thread_pool', charset='utf-8', decode_responses=True)
+
+    redis: RedisConnection = None
 
     @staticmethod
     def add_thread(config: str):
-        ThreadQueue.reddis_connection.set(len(ThreadQueue.reddis_connection.keys()), config)
+        if ThreadQueue.redis is not None:
+            ThreadQueue.redis.put_item(len(ThreadQueue.reddis_connection.keys()), config)
+            k=ThreadQueue.redis.redis_connection.keys()
+            return
 
     @staticmethod
     def get_thread_off_queue():
-        r=ThreadQueue.reddis_connection.get('0')
-
-        ThreadQueue.reddis_connection.delete('0')
-
-        return json.loads(r)
+        if ThreadQueue.redis is not None and '0' in ThreadQueue.redis.redis_connection.keys():
+            r = ThreadQueue.redis.get_and_delete('0')
+            return json.loads(r)
+        else:
+            return None
 
     @staticmethod
     def has_thread():
-        return len(ThreadQueue.reddis_connection.keys()) > 0
+        return ThreadQueue.redis is not None and ThreadQueue.redis.q_size() > 0
+
+    @staticmethod
+    def init_connection(config: RedisConfig):
+        ThreadQueue.redis = RedisConnection(config=config)

@@ -8,6 +8,7 @@ from zdiscord.service.integration.alphav.AlphaV import AlphaV
 from zdiscord.service.integration.chat.discord.Discord import Discord
 from zdiscord.util.logging.LogFactory import LogFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
+from zdiscord.util.general.Main import MainUtil
 
 import json
 from typing import Any
@@ -50,6 +51,9 @@ class App:
     # ingest config
     def ingest_config(self, conf: Any):
         self.conf = json.load(open(conf)) if type(conf) is str else conf
+        if 'agent_stamp' in self.conf.keys() and self.conf['agent_stamp'] is False:
+            MainUtil.init_threadq()
+
         self.crash_restarts = self.conf['crashRestarts'] if 'crashRestarts' in self.conf.keys() else self.crash_restarts
         self.create_objects()
 
