@@ -39,6 +39,7 @@ class App:
         while self.crash_restarts > 0:
             try:
                 logger.info(f"Running app w/ restarts: {self.crash_restarts}")
+                MainUtil.init_threadq()
                 self.run()
             except Exception as e:
                 logger.error(f"Serious problem occured: {errorStackTrace(e)}")
@@ -51,7 +52,7 @@ class App:
     # ingest config
     def ingest_config(self, conf: Any):
         self.conf = json.load(open(conf)) if type(conf) is str else conf
-        if 'agent_stamp' in self.conf.keys() and self.conf['agent_stamp'] is False:
+        if 'agent_stamp' in self.conf['chat'].keys() and self.conf['chat']['agent_stamp'] is False:
             MainUtil.init_threadq()
 
         self.crash_restarts = self.conf['crashRestarts'] if 'crashRestarts' in self.conf.keys() else self.crash_restarts
@@ -80,3 +81,15 @@ class App:
             raise Exception('\'chat\' IS REQUIRED FOR THIS BOT')
         else:
             self.chat = eval(self.conf['chat']['platform'])(self.conf)
+
+    @staticmethod
+    def appMain(config):
+        try:
+            app = App(config=config)
+            main_log = LogFactory.get_logger(logName="main")
+            main_log.info('Init main')
+            app.run_wrapper(main_log)
+        except Exception as e:
+            print(errorStackTrace(e))
+            main_log.error(f"CRITICAL ERROR IN MAIN APP!!! {errorStackTrace(e)}")
+            exit(-1)

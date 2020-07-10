@@ -3,6 +3,7 @@ import zdiscord.service.integration.chat.discord.macros.Weather as Weather
 import zdiscord.service.integration.chat.discord.macros.Giphy as Giphy
 import zdiscord.service.integration.chat.discord.macros.General as General
 import zdiscord.service.integration.chat.discord.macros.Voice as Voice
+import zdiscord.service.integration.chat.discord.macros.Agents as Agent
 
 class MacroFactory:
     STOCKS = Stocks
@@ -10,3 +11,4 @@ class MacroFactory:
     GIPHY = Giphy
     GENERAL = General
     VOICE = Voice
+    AGENT = Agent

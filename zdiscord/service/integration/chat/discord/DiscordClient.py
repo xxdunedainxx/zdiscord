@@ -26,7 +26,7 @@ class DiscordBot(discord.Client, IChatClient):
             return
         else:
             try:
-                await self.event_pusher(DiscordEvent(type='on_message', context={'message_object' : message}))
+                await self.event_pusher(DiscordEvent(type='on_message', context={'message_object' : message}, serialized_context={'User': self.__serialize_user(message.author)}))
             except Exception as e:
                 self._logger.error(msg=f"BAD ERROR \n{errorStackTrace(e)}")
 
@@ -35,3 +35,10 @@ class DiscordBot(discord.Client, IChatClient):
             return
         else:
             await self.event_pusher(DiscordEvent(type='on_voice_state_update', context={'member': member, 'before': before, 'after': after}))
+
+    def __serialize_user(self, user: discord.User) -> {}:
+        return {
+            'name': user.name,
+            'id' : user.id,
+        }
+

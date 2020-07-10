@@ -1,18 +1,5 @@
-from zdiscord.App import App
+from zdiscord.service.ThreadQ import ThreadQueue, ThreadQueueObject
+from zdiscord.service.messaging.Events import IEvent
 
-"""
-from pathos.multiprocessing import ProcessingPool as Pool
-import time
-
-p = Pool(1)
-p.map(self.__middleware.run, [self])
-
-while True:
-    time.sleep(5)
-    p.join()
-"""
-from pathos.multiprocessing import ProcessingPool as Pool
-import queue
-def create_app_process(conf:{}):
-    p = Pool(1)
-    p.map(App, [conf, True])
+async def queue_up_agent(agent_name: str, event: IEvent):
+    ThreadQueue.add_thread(ThreadQueueObject(name=agent_name, context=event.serialize()))

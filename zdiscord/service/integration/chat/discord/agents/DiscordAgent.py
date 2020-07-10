@@ -1,15 +1,16 @@
+from zdiscord.util.general.Agent import Agent
+from zdiscord.service.integration.chat.discord.Discord import Discord
+from zdiscord.service.ServiceFactory import ServiceFactory
 from zdiscord.service.integration.chat.discord.DiscordMiddleware import DiscordMiddleware
-from zdiscord.service.Service import Service
 
 from multiprocessing import Process
 
-class DiscordAgent(Service):
+class DiscordAgent(Discord, Agent):
     def __init__(self, conf: {}):
-        Service.__init__(self, name=self.__class__.__name__)
+        Discord.__init__(conf=conf)
+        Agent.__init__()
 
-        self.agent_configuration = conf
-
-        self.__middleware: DiscordMiddleware = None
+        self.__middleware: DiscordMiddleware = DiscordMiddleware(conf)
 
     def run(self):
-        self.__middleware = DiscordMiddleware(self.agent_configuration)
+        self.__middleware.run()

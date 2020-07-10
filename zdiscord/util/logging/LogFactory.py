@@ -15,6 +15,9 @@ class LogFactory():
             os.makedirs(LogFactory.log_dir)
 
         if logName not in LogFactory.loggers:
+            if os.path.isfile(f"{LogFactory.log_dir}{os.sep}{logName}.log") is False:
+                LogFactory.touch_file(f"{LogFactory.log_dir}{os.sep}{logName}.log")
+
             LogFactory.loggers[logName] = logging.getLogger(logName)
             LogFactory.loggers[logName].setLevel(logging.getLevelName(LogFactory.log_level))
             handler: logging.FileHandler=logging.FileHandler(f"{LogFactory.log_dir}{os.sep}{logName}.log")
@@ -30,3 +33,8 @@ class LogFactory():
 
             LogFactory.loggers[logName].addHandler(handler)
         return LogFactory.loggers[logName]
+
+    @staticmethod
+    def touch_file(path):
+        with open(path, 'a'):
+            os.utime(path, None)

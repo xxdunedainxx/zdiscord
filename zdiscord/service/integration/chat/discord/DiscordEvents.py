@@ -3,10 +3,18 @@ from typing import Any
 import discord
 class DiscordEvent(IEvent):
 
-    def __init__(self, type: str, context: Any = None):
+    def __init__(self, type: str, context: Any = None, serialized_context: {} = {}):
         super().__init__(type, context)
         self.parsed_command: str = None
         self.parsed_message: str = None
+        self.serialized_context:{} = serialized_context
+
+    def serialize(self) -> {}:
+        return {
+            'type' : self.type,
+            'context': self.serialized_context
+        }
+
 
 class DiscordOnVoiceStateUpdateEvent(EventConfig):
     def __init__(self, conf: {}):
