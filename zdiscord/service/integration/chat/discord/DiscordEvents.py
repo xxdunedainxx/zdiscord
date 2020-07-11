@@ -15,6 +15,12 @@ class DiscordEvent(IEvent):
             'context': self.serialized_context
         }
 
+class DiscordAlwaysTrue(EventConfig):
+    def __init__(self, conf: {}):
+        super().__init__(conf)
+
+    def is_valid_event(self, event: IEvent) -> bool:
+        return True
 
 class DiscordOnVoiceStateUpdateEvent(EventConfig):
     def __init__(self, conf: {}):

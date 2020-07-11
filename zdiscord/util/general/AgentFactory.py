@@ -1,6 +1,7 @@
 from zdiscord.service.Service import Service
 from zdiscord.util.general.Agent import Agent
 from zdiscord.service.integration.chat.discord.agents.DiscordAgent import DiscordAgent
+from zdiscord.service.integration.chat.discord.agents.games.tictactoe.TicTacToe import DiscordTicTacToe
 from multiprocessing import Process
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.service.ThreadQ import ThreadQueue, ThreadQueueObject
@@ -60,7 +61,7 @@ class AgentFactory(Service):
 
             agent_conf['chat'] = {}
             agent_conf['chat']['token'] = conf['chat']['token']
-            agent_conf['chat']['platform'] = conf['chat']['platform']
+            agent_conf['chat']['platform'] = agent_conf['platform'] if 'platform' in agent_conf.keys() else conf['chat']['platform']
             agent_conf['chat']['agent_stamp'] = True
 
             self.AGENT_CONFIGS[agent] = agent_conf

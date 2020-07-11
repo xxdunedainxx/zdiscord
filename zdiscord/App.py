@@ -6,6 +6,8 @@ from zdiscord.service.integration.weather.Weather import Weather
 from zdiscord.service.integration.giphy.Giphy import Giphy
 from zdiscord.service.integration.alphav.AlphaV import AlphaV
 from zdiscord.service.integration.chat.discord.Discord import Discord
+from zdiscord.service.integration.chat.discord.agents.DiscordAgent import DiscordAgent
+from zdiscord.service.integration.chat.discord.agents.games.tictactoe.TicTacToe import DiscordTicTacToe
 from zdiscord.util.logging.LogFactory import LogFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.util.general.Main import MainUtil

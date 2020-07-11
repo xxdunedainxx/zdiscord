@@ -7,10 +7,6 @@ from multiprocessing import Process
 
 class DiscordAgent(Discord, Agent):
     def __init__(self, conf: {}):
-        Discord.__init__(conf=conf)
-        Agent.__init__()
+        Discord.__init__(self,conf=conf)
+        Agent.__init__(self)
 
-        self.__middleware: DiscordMiddleware = DiscordMiddleware(conf)
-
-    def run(self):
-        self.__middleware.run()

@@ -3,10 +3,13 @@ from zdiscord.service.integration.chat.discord.DiscordMiddleware import DiscordM
 
 class Discord(Service):
     def __init__(self, conf: {}):
-
+        self.middleware: DiscordMiddleware
+        self.conf = conf
         super().__init__(name=self.__class__.__name__)
-        
-        self.__middleware: DiscordMiddleware = DiscordMiddleware(conf)
+
+    def bootstrap(self, conf):
+        self.middleware: DiscordMiddleware = DiscordMiddleware(conf)
 
     def run(self):
-        self.__middleware.run()
+        self.bootstrap(self.conf)
+        self.middleware.run()

@@ -7,7 +7,6 @@ from zdiscord.util.general.AgentFactory import AgentFactory
 
 AppRunner: AgentFactory = AgentFactory
 
-
 if __name__ == '__main__':
     try:
         AppRunner: AgentFactory = AgentFactory('./zdiscord/app.json')
@@ -15,4 +14,3 @@ if __name__ == '__main__':
     except Exception as e:
         print(errorStackTrace(e))
         exit(-1)
-
