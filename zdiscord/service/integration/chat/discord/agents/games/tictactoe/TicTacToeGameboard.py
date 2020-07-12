@@ -33,8 +33,17 @@ class RealPlayer(Player):
 class Move:
 
   def __init__(self, input: str, owner: Player):
-    self.x_quadrant: int = int(input.split(',')[0]) if ',' in input else -1
-    self.y_quadrant: int = int(input.split(',')[1]) if ',' in input else -1
+    try:
+      self.x_quadrant: int = int(input.split(',')[0]) if ',' in input else -1
+      self.y_quadrant: int = int(input.split(',')[1]) if ',' in input else -1
+    except Exception as e:
+      self.x_quadrant = -1
+      self.y_quadrant = -1
+
+    if (self.x_quadrant < 0 or self.x_quadrant > TicTacToeGameboard.GAME_BOARD_SIZE - 1) or \
+       (self.y_quadrant < 0 or self.y_quadrant > TicTacToeGameboard.GAME_BOARD_SIZE - 1):
+      self.x_quadrant = -1
+      self.y_quadrant = -1
 
     self.symbol: str = owner.symbol
     self.owner: Player = owner
@@ -72,8 +81,9 @@ class TicTacToeGameboard:
     TicTacToeGameboard.game_loop(game)
 
   X_MOVE = 'x'
-  O_MOVE = 'O'
+  O_MOVE = 'o'
   BLANK = '+'
+  GAME_BOARD_SIZE=3
 
   def __init__(self, playerOne: Player, playerTwo: Player):
     self.player_one: Player = playerOne
@@ -94,11 +104,11 @@ class TicTacToeGameboard:
 
   def print_board(self):
     return (
-      f""".-------.\n"""\
+      f"""----------\n"""\
       f"""| {'-'.join(self.GAME_BOARD[0])} |\n""" \
       f"""| {'-'.join(self.GAME_BOARD[1])} |\n""" \
       f"""| {'-'.join(self.GAME_BOARD[2])} |\n"""\
-      f""".-------."""
+      f"""----------"""
       )
 
   def start_game(self):
@@ -146,6 +156,13 @@ class TicTacToeGameboard:
       self.GAME_BOARD[move.y_quadrant][move.x_quadrant] == TicTacToeGameboard.BLANK
     )
 
+  def _check_draw(self):
+    for column in self.GAME_BOARD:
+      for row in column:
+        if row == TicTacToeGameboard.BLANK:
+          return False
+    return True
+
   def _evaluate_game(self, player: Player) -> str:
     # Test paths from every corner
 
@@ -165,6 +182,14 @@ class TicTacToeGameboard:
     eval=self.__evaluate_all_paths(2, 2,player.symbol)
     if eval != '':
       return player.name
+
+    eval=self.__evaluate_all_paths(1, 1,player.symbol)
+    if eval != '':
+      return player.name
+
+    if self._check_draw():
+      self.game_is_live = False
+      return "ITS A DRAW!"
 
   def __bound_check(self, x, y):
     c1=(x >= 0 and y >= 0)

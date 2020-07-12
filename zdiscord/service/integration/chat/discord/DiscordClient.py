@@ -22,6 +22,7 @@ class DiscordBot(discord.Client, IChatClient):
         self._logger.info(f"Logged on as {self.user}")
         await self.event_pusher(DiscordEvent(type='on_ready'))
 
+
     async def on_message(self, message: discord.Message):
         if message.author == self.user:
             return

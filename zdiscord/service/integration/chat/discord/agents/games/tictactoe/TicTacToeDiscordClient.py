@@ -30,7 +30,11 @@ class TicTacToeDiscordClient(DiscordBot):
       else:
         self.player_two = None
 
-      self.channel: discord.abc.Messageable = await self.fetch_channel(channel_id=self.context['context']['channel'])
+      try:
+        self.channel = await self.fetch_channel(channel_id=self.context['context']['channel'])
+      except Exception as e:
+        self.channel = discord.utils.get(self.get_all_channels(), id=self.context['context']['channel'])
+
       await self.channel.send('Game has started!')
 
       event_to_push: DiscordEvent = DiscordEvent(type='on_ready')

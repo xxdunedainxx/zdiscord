@@ -5,6 +5,7 @@ from zdiscord.App import App
 # https://stackoverflow.com/questions/42999961/ffmpeg-binary-not-found-python
 from zdiscord.util.general.AgentFactory import AgentFactory
 
+
 AppRunner: AgentFactory = AgentFactory
 
 if __name__ == '__main__':

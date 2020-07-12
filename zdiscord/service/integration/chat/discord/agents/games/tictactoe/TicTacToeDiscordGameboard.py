@@ -9,8 +9,8 @@ class DiscordPlayer(RealPlayer):
     self.discord_user = discordUser
 
   # Discord API interaction
-  def interact(self, msg: str):
-    self.discord_user.send(msg)
+  async def interact(self, msg: str):
+    await self.discord_user.send(msg)
 
 class DiscordTicTacToeGameboard(TicTacToeGameboard):
 
@@ -18,7 +18,7 @@ class DiscordTicTacToeGameboard(TicTacToeGameboard):
     TicTacToeGameboard.__init__(self, playerOne, playerTwo)
 
     self.current_player: Player = playerOne
-    self.channel: discord.abc.Messageable = channel
+    self.channel = channel
 
   async def discord_event(self, event: DiscordEvent):
     if type(self.current_player) is not DiscordPlayer:
@@ -40,11 +40,19 @@ class DiscordTicTacToeGameboard(TicTacToeGameboard):
     if type(self.current_player) is AIPlayer:
       move=self.current_player.input()
       await self.interact(move)
+    else:
+      await self.current_player.interact(f"Your move! current board:\n{self.print_board()}")
 
   async def interact(self, move: Move) -> str:
 
     if self._is_valid_move(move) is False:
-      await move.owner.interact(f"Invalid move provided! Please provide input in the form X,Y, and in an empty space.\n{self.print_board()}")
+      if type(move.owner) is not AIPlayer:
+        await self.current_player.interact(f"Invalid move provided! Please provide input in the form X,Y, and in an empty space.\n{self.print_board()}")
+        return
+      else:
+        move = self.current_player.input()
+        while self._is_valid_move(move) == False:
+          move = self.current_player.input()
 
     self._move(move=move)
     game_result: str = self._evaluate_game(player=self.player_one)
@@ -59,6 +67,8 @@ class DiscordTicTacToeGameboard(TicTacToeGameboard):
       await self.channel.send(f"Winner! {game_result}")
       exit(0)
 
-    await self.channel.send(f"Current Board {self.print_board()}")
+    if type(move.owner) is not AIPlayer:
+      await self.channel.send(f"**{self.player_one.name} vs {self.player_two.name}**\nCurrent Board\n{self.print_board()}")
+
     await self.swap_players()
 
