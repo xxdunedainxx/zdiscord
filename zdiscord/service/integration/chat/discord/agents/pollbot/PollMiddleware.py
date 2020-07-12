@@ -31,36 +31,6 @@ class PollMiddleware(DiscordMiddleware):
 
     async def on_ready(self, event: DiscordEvent):
         self._logger.info(f"The tic tac toe game has started!")
-        self._GAME: DiscordTicTacToeGameboard = DiscordTicTacToeGameboard(
-            playerOne=DiscordPlayer(
-                name=self._chat_client.player_one.name,
-                symbol=DiscordTicTacToeGameboard.X_MOVE,
-                discordUser=event.context['players']['player_one']
-            ),
-            playerTwo=AIPlayer(symbol=DiscordTicTacToeGameboard.O_MOVE),
-            channel=self._chat_client.channel,
-        )
+        ServiceFactory.SERVICES['PollBot'] = self._chat_client
+        MacroFactory.POLLBOT = TicTacToeMoves
 
-        ServiceFactory.SERVICES['TicTacToe'] = self._GAME
-        MacroFactory.TICTACTOE = TicTacToeMoves
-
-        await self._chat_client.channel.send(self._GAME.print_board())
-
-    async def event_subscriber(self, event: DiscordEvent):
-        try:
-            if event.type == 'on_ready':
-                await self.on_ready(event=event)
-
-            event_config: EventConfig = self._ef.is_valid_event(event=event)
-            # Throw away invalid events
-            if event_config is None:
-                return
-            try:
-                self._logger.info(f"Event from discord client \'{str(event.type)}\'")
-                await self._cf.execute_cmd(event, event_config)
-            except Exception as e:
-                self._logger.error(f"SOMETHING BAD HAPPENED {errorStackTrace(e)}")
-                await event.context['message_object'].channel.send("Something bad happened :(")
-        except Exception as e:
-            self._logger.error(f"Failed to process event {errorStackTrace(e)}")
-            return

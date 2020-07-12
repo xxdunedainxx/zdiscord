@@ -1,3 +1,5 @@
+
+
 import logging
 
 from zdiscord.service.ServiceFactory import ServiceFactory
@@ -17,6 +19,8 @@ from typing import Any
 
 # TODO standalone object factory
 # App config & object factory
+# /usr/bin/ffmpeg
+# C:\\Users\\zach\\Documents\\ffmpeg\\ffmpeg-20200615-9d80f3e-win64-static\\bin\\ffmpeg.exe
 
 class App:
 

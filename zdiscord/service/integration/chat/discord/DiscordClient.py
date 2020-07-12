@@ -38,6 +38,12 @@ class DiscordBot(discord.Client, IChatClient):
         else:
             await self.event_pusher(DiscordEvent(type='on_voice_state_update', context={'member': member, 'before': before, 'after': after}))
 
+    async def on_reaction_add(self, reaction, user):
+        return
+
+    async def on_reaction_remove(self, reaction, user):
+        return
+
     def _serialize_user(self, user: discord.User) -> {}:
         return {
             'name': user.name,
