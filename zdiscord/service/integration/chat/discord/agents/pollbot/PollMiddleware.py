@@ -15,7 +15,7 @@ import zdiscord.service.integration.chat.discord.agents.games.tictactoe.macros.M
 import discord
 from typing import Any
 
-class DiscordTicTacToeMiddleware(DiscordMiddleware):
+class PollMiddleware(DiscordMiddleware):
     def __init__(self, conf: {}):
         super().__init__(conf=conf)
 

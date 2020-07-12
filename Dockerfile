@@ -19,4 +19,6 @@ RUN sed -i 's/\r//g' ./setup.sh
 
 RUN bash ./setup.sh
 
+EXPOSE 6379
+
 CMD ["/home/zdiscord/app/app.sh"] 
