@@ -3,10 +3,26 @@ from typing import Any
 import discord
 class DiscordEvent(IEvent):
 
-    def __init__(self, type: str, context: Any = None):
+    def __init__(self, type: str, context: Any = None, serialized_context: {} = {}):
         super().__init__(type, context)
         self.parsed_command: str = None
         self.parsed_message: str = None
+        self.serialized_context:{} = serialized_context
+
+    def serialize(self) -> {}:
+        return {
+            'type' : self.type,
+            'context': self.serialized_context,
+            'parsed_command': self.parsed_command,
+            'parsed_message': self.parsed_message,
+        }
+
+class DiscordAlwaysTrue(EventConfig):
+    def __init__(self, conf: {}):
+        super().__init__(conf)
+
+    def is_valid_event(self, event: IEvent) -> bool:
+        return True
 
 class DiscordOnVoiceStateUpdateEvent(EventConfig):
     def __init__(self, conf: {}):

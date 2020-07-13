@@ -14,26 +14,23 @@ from typing import Any
 class DiscordMiddleware(IChatMiddleware):
     def __init__(self, conf: {}):
         super().__init__(conf=conf)
-        self.__API_TOKEN = conf['chat']['token']
-        self._chat_client: DiscordBot = DiscordBot(eventPusher=self.event_subscriber)
+        self._API_TOKEN = conf['chat']['token']
         self._ef: DiscordEventFactory = DiscordEventFactory(conf=conf['event_factory'] if 'event_factory' in conf.keys() else {})
         self._vf: VoiceFactory = VoiceFactory(conf['voice_factory']['conf'], conf['voice_factory']['ffmpeg']) if 'voice_factory' in conf.keys() and 'ffmpeg' in conf['voice_factory'].keys() else None
-
-        if self._vf is not None:
-            self.__voice_client = DiscordVoice(bot=self._chat_client, voiceFactory=self._vf, ffmpeg=self._vf.ffmpeg)
-            ServiceFactory.SERVICES['voice'] = self.__voice_client
 
         self._cf: DiscordCommandMiddleware = DiscordCommandMiddleware(conf=conf['command_factory'] if 'command_factory' in conf.keys() else {})
         self._logger.info("DiscordMiddleware initialized!")
 
+    def bootstrap_chat_client(self):
+        self._chat_client: DiscordBot = DiscordBot(eventPusher=self.event_subscriber)
+        if self._vf is not None:
+            self.__voice_client = DiscordVoice(bot=self._chat_client, voiceFactory=self._vf, ffmpeg=self._vf.ffmpeg)
+            ServiceFactory.SERVICES['voice'] = self.__voice_client
+
     def run(self):
-        self._chat_client.run(self.__API_TOKEN)
-
-
-    async def on_message(self, event: DiscordEvent):
-        msg: discord.Message = event.context['message_object']
-        await msg.channel.send('test!')
-
+        self.bootstrap_chat_client()
+        self._logger.info("In thread?")
+        self._chat_client.run(self._API_TOKEN)
 
     async def event_subscriber(self, event: DiscordEvent):
         try:

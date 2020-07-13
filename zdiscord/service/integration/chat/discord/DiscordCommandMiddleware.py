@@ -89,6 +89,3 @@ class DiscordCommandMiddleware(CommandFactory):
 
     async def execute_cmd(self, event: DiscordEvent, eventConfig: EventConfig):
         await self._COMMAND_CONFIGS[eventConfig.lookup].run(event)
-# except AttributeError:
-# c=getattr(self.COMMAND_IMPORTER, 'StaticCommand')
-# return

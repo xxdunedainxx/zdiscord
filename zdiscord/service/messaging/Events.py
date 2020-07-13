@@ -5,6 +5,12 @@ class IEvent:
         self.type = type
         self.context = context
 
+    def serialize(self) -> {}:
+        return {
+            'type' : self.type,
+            'context': self.context
+        }
+
 class EventConfig:
     def __init__(self, conf: {}):
         self.conf = conf

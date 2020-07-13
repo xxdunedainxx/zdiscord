@@ -1,0 +1,10 @@
+{
+  "app_json_path" : "./zdiscord/app.json",
+  "thread_q" : {
+    "redis" : {
+      "host" : "localhost",
+      "port" : 6379,
+      "db"   : "thread_pool"
+    }
+  }
+}
