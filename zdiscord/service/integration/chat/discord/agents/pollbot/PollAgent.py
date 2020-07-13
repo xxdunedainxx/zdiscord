@@ -1,5 +1,5 @@
 from zdiscord.service.integration.chat.discord.agents.DiscordAgent import DiscordAgent
-from zdiscord.service.integration.chat.discord.agents.games.tictactoe.TicTacToeMiddleware import DiscordTicTacToeMiddleware
+from zdiscord.service.integration.chat.discord.agents.pollbot.PollMiddleware import PollMiddleware
 
 class PollAgent(DiscordAgent):
     def __init__(self, conf: {}):
@@ -9,4 +9,4 @@ class PollAgent(DiscordAgent):
         self.bootstrap(conf=conf)
 
     def bootstrap(self, conf):
-        self.middleware: DiscordTicTacToeMiddleware = DiscordTicTacToeMiddleware(conf)
+        self.middleware: PollMiddleware = PollMiddleware(conf)

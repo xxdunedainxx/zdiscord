@@ -3,6 +3,7 @@ from zdiscord.util.general.Agent import Agent
 from zdiscord.util.general.AgentProcess import AgentProcess
 from zdiscord.service.integration.chat.discord.agents.DiscordAgent import DiscordAgent
 from zdiscord.service.integration.chat.discord.agents.games.tictactoe.TicTacToe import DiscordTicTacToe
+from zdiscord.service.integration.chat.discord.agents.pollbot.PollAgent import PollAgent
 from multiprocessing import Process
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.service.ThreadQ import ThreadQueue, ThreadQueueObject
@@ -57,6 +58,7 @@ class AgentFactory(Service):
         elif self.PROC_MAP[process].timed_out():
           self._logger.info(f"Killing process {process}")
           self.PROC_MAP[process].expire()
+          self.PROC_MAP.pop(process)
         else:
           continue
 

@@ -12,7 +12,9 @@ class DiscordEvent(IEvent):
     def serialize(self) -> {}:
         return {
             'type' : self.type,
-            'context': self.serialized_context
+            'context': self.serialized_context,
+            'parsed_command': self.parsed_command,
+            'parsed_message': self.parsed_message,
         }
 
 class DiscordAlwaysTrue(EventConfig):
