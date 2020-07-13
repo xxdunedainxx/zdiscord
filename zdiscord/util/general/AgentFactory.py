@@ -74,7 +74,7 @@ class AgentFactory(Service):
           time.sleep(5)
         print("main process died???")
       except Exception as e:
-        self._logger.error("CRITICAL ERROR, MAIN PROCESS SHIT ITSELF. DYING")
+        self._logger.error(f"CRITICAL ERROR, MAIN PROCESS SHIT ITSELF. DYING {errorStackTrace(e)}")
         exit(-1)
 
     def setup_agent_configs(self, conf:{}):
