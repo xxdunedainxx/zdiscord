@@ -20,7 +20,7 @@ class LogFactory():
 
             LogFactory.loggers[logName] = logging.getLogger(logName)
             LogFactory.loggers[logName].setLevel(logging.getLevelName(LogFactory.log_level))
-            handler: logging.FileHandler=logging.FileHandler(f"{LogFactory.log_dir}{os.sep}{logName}.log")
+            handler: logging.FileHandler=logging.FileHandler(f"{LogFactory.log_dir}{os.sep}{logName}.log", encoding='utf-8')
             formatter: logging.Formatter = logging.Formatter('[%(asctime)s %(levelname)s]: %(message)s')
             handler.setFormatter(formatter)
 
