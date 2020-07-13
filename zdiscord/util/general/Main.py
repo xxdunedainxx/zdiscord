@@ -8,7 +8,7 @@ class MainUtil:
 
   @staticmethod
   def load_master_config(path: str) -> {}:
-    return json.load(open(path))
+    return json.load(open(path, encoding='utf-8'))
 
   @staticmethod
   def init_threadq():

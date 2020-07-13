@@ -17,7 +17,7 @@ import string
 
 class AgentFactory(Service):
     def __init__(self, conf: {}):
-        self.conf = json.load(open(conf))
+        self.conf = json.load(open(conf, encoding='utf-8'))
         self.__init_logger()
 
         super().__init__(name=self.__class__.__name__)
