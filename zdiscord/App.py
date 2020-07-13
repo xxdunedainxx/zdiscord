@@ -58,7 +58,7 @@ class App:
 
     # ingest config
     def ingest_config(self, conf: Any):
-        self.conf = json.load(open(conf)) if type(conf) is str else conf
+        self.conf = json.load(open(conf), encoding='utf-8') if type(conf) is str else conf
         if 'agent_stamp' in self.conf['chat'].keys() and self.conf['chat']['agent_stamp'] is False:
             MainUtil.init_threadq()
 
