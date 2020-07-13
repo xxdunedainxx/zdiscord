@@ -50,7 +50,7 @@ class PollDiscordClient(DiscordBot):
     def poll_end_message(self):
       msg: str = (
         f"""--------------\n"""\
-        f"""**POLL RESULTS**\n"""\
+        f"""**\'{self.name}\' POLL RESULTS**\n"""\
         f"""\n"""\
       )
       for submission in self.submissions.keys():
