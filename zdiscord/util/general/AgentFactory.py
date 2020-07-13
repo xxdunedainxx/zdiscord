@@ -52,15 +52,21 @@ class AgentFactory(Service):
 
     def __eval_current_threads(self):
       self._logger.info(f"Checkin current processes, {self.PROC_MAP}")
+      
+      keys_to_kill: [str] = []
+
       for process in self.PROC_MAP.keys():
         if process == 'main':
           continue
         elif self.PROC_MAP[process].timed_out():
           self._logger.info(f"Killing process {process}")
           self.PROC_MAP[process].expire()
-          self.PROC_MAP.pop(process)
+          keys_to_kill.append(process)
         else:
           continue
+
+      for key_to_kill in keys_to_kill:
+        self.PROC_MAP.pop(key_to_kill)
 
     def __run_main_process(self):
       try:
