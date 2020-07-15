@@ -12,7 +12,7 @@ class VoiceFactory(Service):
         setup: bool = self.__init_config(confLocation)
 
     def __init_config(self, confLocation: str) -> bool:
-        conf: {} = json.load(open(confLocation))
+        conf: {} = json.load(open(confLocation, encoding='utf-8'))
         self.__VOICE_CONFIGS = conf['voice'] if 'voice' in conf.keys() else {'default' : {'channel_to_join': 'Team Rheem', 'stream_link': 'https://www.youtube.com/embed/kYXRfwXfz5A'}}
         self._logger.info("init voice config")
 
