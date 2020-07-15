@@ -11,6 +11,9 @@ from zdiscord.util.logging.LogFactory import LogFactory
 from zdiscord.App import App
 from zdiscord.util.general.Main import MainUtil
 from zdiscord.util.general.JobManager import JobManager
+from zdiscord.util.general.Job import Job
+from zdiscord.util.general.JobQ import RUNNING_JOBS
+from zdiscord.util.general.JobProcess import JobProcess
 import random
 import time
 import json
@@ -26,6 +29,7 @@ class AgentFactory(Service):
         self.AGENT_CONFIGS: {} = {}
 
         self.PROC_MAP : {} = {}
+        self.JOB_MAP : {} = {}
 
         self.setup_agent_configs(self.conf)
 
@@ -54,21 +58,43 @@ class AgentFactory(Service):
         LogFactory.log_stdout = self.conf['log']['log_stdout'] if 'log_stdout' in self.conf[
           'log'].keys() else LogFactory.log_stdout
 
+    def __eval_current_jobs(self):
+      self._logger.info(f"Checkin current jobs, {self.JOB_MAP}")
+      keys_to_kill: [str] = []
+
+      for job in self.JOB_MAP.keys():
+        if job == 'main':
+          continue
+        elif self.JOB_MAP[job].timed_out():
+          self._logger.info(f"Killing process {job}")
+          self.JOB_MAP[job].expire()
+          keys_to_kill.append(job)
+        else:
+          continue
+
+      for key_to_kill in keys_to_kill:
+        self.PROC_MAP.pop(key_to_kill)
+
     def __eval_current_threads(self):
       self._logger.info(f"Checkin current processes, {self.PROC_MAP}")
+      keys_to_kill: [str] = []
+
       for process in self.PROC_MAP.keys():
         if process == 'main':
           continue
         elif self.PROC_MAP[process].timed_out():
           self._logger.info(f"Killing process {process}")
           self.PROC_MAP[process].expire()
-          self.PROC_MAP.pop(process)
+          keys_to_kill.append(process)
         else:
           continue
 
+      for key_to_kill in keys_to_kill:
+        self.PROC_MAP.pop(key_to_kill)
+
     def __init_job_factory(self):
         if 'jobs' in self.conf.keys():
-            self.JOBS: JobManager = JobManager(jobConfigs=self.conf['jobs'])
+            self.JOBS: JobManager = JobManager(jobConfigs=self.conf['jobs'], logConfig=self.conf['log'])
         else:
             self._logger.warning("\'jobs\' config not present, no jobs set up for this app!")
 
@@ -80,7 +106,14 @@ class AgentFactory(Service):
             agent_config: ThreadQueueObject = ThreadQueue.get_thread_off_queue()
             if agent_config is not None:
               self.run(agent_config)
+          print(RUNNING_JOBS)
+          if len(RUNNING_JOBS) > 0:
+            job=RUNNING_JOBS.pop(0)
+            self.run_job(job=job)
+
           self.__eval_current_threads()
+          self.__eval_current_jobs()
+          self.JOBS.run_jobs()
           time.sleep(5)
         print("main process died???")
       except Exception as e:
@@ -103,6 +136,21 @@ class AgentFactory(Service):
     def __agent_id(self) -> str:
       return ''.join(random.choice(string.ascii_lowercase) for i in range(10))
 
+
+    def run_job(self, job: Job):
+      try:
+        job_id = f"{job.name}-{job.job_id()}"
+        self._logger.info(f"Starting up job {job_id}")
+        self.JOB_MAP[job_id] = JobProcess(job)
+        self.JOB_MAP[job_id].process = Process(target=job.execute_job, args=(job.conf,))
+
+        # Start child worker
+        self.JOB_MAP[job_id].run()
+
+        self._logger.info(f"{job_id} started!")
+        return
+      except Exception as e:
+        self._logger.error(f"Failed to spin up process {errorStackTrace(e)}")
     def run(self, agent: ThreadQueueObject):
       try:
         agent_id = f"{agent.name}-{self.__agent_id()}"

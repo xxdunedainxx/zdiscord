@@ -14,8 +14,6 @@ class DiscordBot(discord.Client, IChatClient):
 
         # Push events to client middleware
         self.event_pusher = eventPusher
-        self.event_pusher(DiscordEvent(type='test'))
-
 
     async def on_ready(self):
         #self.__voice_client = DiscordVoice(bot=self, ffmpeg=self.__vf.ffmpeg)
