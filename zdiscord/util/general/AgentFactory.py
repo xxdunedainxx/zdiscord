@@ -10,6 +10,7 @@ from zdiscord.service.ThreadQ import ThreadQueue, ThreadQueueObject
 from zdiscord.util.logging.LogFactory import LogFactory
 from zdiscord.App import App
 from zdiscord.util.general.Main import MainUtil
+from zdiscord.util.general.JobManager import JobManager
 import random
 import time
 import json
@@ -29,6 +30,9 @@ class AgentFactory(Service):
         self.setup_agent_configs(self.conf)
 
         self._logger.info("Init Agent Factory..")
+
+        self.JOBS: JobManager = None
+        self.__init_job_factory()
 
     def main(self):
         self._logger.info("Running app MAIN")
@@ -61,6 +65,12 @@ class AgentFactory(Service):
           self.PROC_MAP.pop(process)
         else:
           continue
+
+    def __init_job_factory(self):
+        if 'jobs' in self.conf.keys():
+            self.JOBS: JobManager = JobManager(jobConfigs=self.conf['jobs'])
+        else:
+            self._logger.warning("\'jobs\' config not present, no jobs set up for this app!")
 
     def __run_main_process(self):
       try:
