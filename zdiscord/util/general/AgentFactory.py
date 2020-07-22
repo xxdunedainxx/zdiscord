@@ -73,7 +73,7 @@ class AgentFactory(Service):
           continue
 
       for key_to_kill in keys_to_kill:
-        self.PROC_MAP.pop(key_to_kill)
+        self.JOB_MAP.pop(key_to_kill)
 
     def __eval_current_threads(self):
       self._logger.info(f"Checkin current processes, {self.PROC_MAP}")
