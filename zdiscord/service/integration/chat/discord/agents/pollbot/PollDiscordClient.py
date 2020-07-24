@@ -88,6 +88,7 @@ class PollDiscordClient(DiscordBot):
         return
       else:
         try:
+          message = self.clean_message(message)
           if 'close poll' in message.content.lower():
             self._logger.info("ending poll and printing results")
             await self.close_out()

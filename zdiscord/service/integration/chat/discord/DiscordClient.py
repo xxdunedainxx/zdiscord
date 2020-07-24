@@ -15,6 +15,10 @@ class DiscordBot(discord.Client, IChatClient):
         # Push events to client middleware
         self.event_pusher = eventPusher
 
+    def clean_message(self, message: discord.Message) -> discord.Message:
+        message.content = message.content.lower()
+        return message
+
     async def on_ready(self):
         #self.__voice_client = DiscordVoice(bot=self, ffmpeg=self.__vf.ffmpeg)
         self._logger.info(f"Logged on as {self.user}")
@@ -26,6 +30,7 @@ class DiscordBot(discord.Client, IChatClient):
             return
         else:
             try:
+                message=self.clean_message(message)
                 await self.event_pusher(DiscordEvent(type='on_message', context={'message_object' : message}, serialized_context={'User': self._serialize_user(message.author), 'message_id': message.id, 'channel': message.channel.id}))
             except Exception as e:
                 self._logger.error(msg=f"BAD ERROR \n{errorStackTrace(e)}")

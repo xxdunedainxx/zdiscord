@@ -52,6 +52,8 @@ class TicTacToeDiscordClient(DiscordBot):
     async def on_message(self, message: discord.Message):
       if self.is_ready == False:
         return
+      
+      message = self.clean_message(message)
 
       # Only interact w/ game owner
       if message.author != self.player_one or (self.player_two is not None and message.author != self.player_two):

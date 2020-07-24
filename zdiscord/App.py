@@ -16,6 +16,7 @@ from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.util.general.Main import MainUtil
 
 import json
+import asyncio
 from typing import Any
 
 # TODO standalone object factory
@@ -48,9 +49,14 @@ class App:
                 logger.info(f"Running app w/ restarts: {self.crash_restarts}")
                 MainUtil.init_threadq()
                 self.run()
+            except RuntimeError as e:
+                if e == 'Event loop is closed':
+                    logger.warning("asyncio is broken, restarting event loop")
+                    asyncio.set_event_loop(asyncio.new_event_loop())
             except Exception as e:
                 logger.error(f"Serious problem occured: {errorStackTrace(e)}")
-                self.crash_restarts-=1
+            finally:
+                self.crash_restarts -= 1
         raise Exception(f"total crashes reached!")
 
     def run(self):
