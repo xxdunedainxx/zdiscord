@@ -1,10 +1,13 @@
 # Docker commands
 # docker run -ti --entrypoint /bin/sh band-site
 # docker build .
-# 
+# docker build . --build-arg UBUNTU_IMAGE=i386/ubuntu:latest <-- for other architectures
 
 # Load ubuntu
-FROM ubuntu:latest
+ARG UBUNTU_IMAGE=ubuntu:latest
+
+# Load ubuntu
+FROM ${UBUNTU_IMAGE}
 
 ENV BUILD_DIR=usr/src/build
 
