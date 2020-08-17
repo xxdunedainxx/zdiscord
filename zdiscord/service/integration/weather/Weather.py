@@ -1,4 +1,5 @@
 from zdiscord.service.integration.Integration import IIntegration
+from zdiscord.util.general.world.UsaConversionTables import UsaConversionTables
 import requests
 
 class Weather(IIntegration):
@@ -12,7 +13,16 @@ class Weather(IIntegration):
         weather_info: requests.Response = self.get_weather(query)
 
         if (weather_info.status_code != 200):
-            return "there is no weather today :( \n (something went wrong)\nNOTE: You must submit your query something like: \'Town,State\'"
+            try:
+                query_split=query.split(',')
+                query=f"{query_split[0]},{UsaConversionTables.abbrev_us_state[query_split[1]]}"
+                weather_info: requests.Response = self.get_weather(query)
+                if (weather_info.status_code != 200):
+                    return "there is no weather today :( \n (something went wrong)\nNOTE: You must submit your query something like: \'Town,State\'"
+                else:
+                    return self.format_weather(weather_info.json())
+            except Exception as e:
+                return "there is no weather today :( \n (something went wrong)\nNOTE: You must submit your query something like: \'Town,State\'"
         else:
             return self.format_weather(weather_info.json())
 
