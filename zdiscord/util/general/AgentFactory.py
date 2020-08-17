@@ -111,7 +111,6 @@ class AgentFactory(Service):
             self.JOBS: JobManager = JobManager(jobConfigs=self.conf['jobs'], logConfig=self.conf['log'])
         else:
             self._logger.warning("\'jobs\' config not present, no jobs set up for this app!")
-
     def __run_main_process(self):
       try:
         while self.PROC_MAP['main'].is_alive():

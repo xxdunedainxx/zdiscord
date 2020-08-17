@@ -124,7 +124,7 @@ class PollDiscordClient(DiscordBot):
         self._logger.warning(f"Issue parsing emoji: {errorStackTrace(e)}")
 
     def eval_reaction(self, discordReaction: discord.RawReactionActionEvent) -> str:
-      reaction: str = str(discordReaction.emoji.name.encode('utf-8'), encoding='ansi')
+      reaction: str = str(discordReaction.emoji.name.encode('utf-8'), encoding='utf-8')
       if discordReaction.message_id != self.__POLL_MESSAGE.id:
         return ''
       else:
