@@ -15,7 +15,7 @@ class Weather(IIntegration):
         if (weather_info.status_code != 200):
             try:
                 query_split=query.split(',')
-                query=f"{query_split[0]},{UsaConversionTables.abbrev_us_state[query_split[1]]}"
+                query=f"{query_split[0]},{UsaConversionTables.abbrev_us_state[query_split[1].upper().strip()]}"
                 weather_info: requests.Response = self.get_weather(query)
                 if (weather_info.status_code != 200):
                     return "there is no weather today :( \n (something went wrong)\nNOTE: You must submit your query something like: \'Town,State\'"
