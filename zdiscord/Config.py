@@ -27,7 +27,7 @@ class App:
 
     # ingest config
     def ingest_config(self, conf: str):
-        self.conf = json.load(open(conf))
+        self.conf = json.load(open(conf, encoding='utf-8'))
 
         self.create_objects()
 

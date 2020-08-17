@@ -1,4 +1,3 @@
-from zdiscord.util.logging.LogFactory import LogFactory
 from zdiscord.util.error.ErrorFactory import errorStackTrace
 from zdiscord.App import App
 # https://discordpy.readthedocs.io/en/latest/api.html#discord-api-events

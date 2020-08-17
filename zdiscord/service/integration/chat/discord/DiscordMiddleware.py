@@ -32,6 +32,9 @@ class DiscordMiddleware(IChatMiddleware):
         self._logger.info("In thread?")
         self._chat_client.run(self._API_TOKEN)
 
+    def is_alive(self) -> bool:
+        return not self._chat_client.is_closed()
+
     async def event_subscriber(self, event: DiscordEvent):
         try:
             event_config: EventConfig = self._ef.is_valid_event(event=event)
