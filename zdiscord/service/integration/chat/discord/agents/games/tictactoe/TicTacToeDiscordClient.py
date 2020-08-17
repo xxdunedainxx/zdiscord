@@ -52,7 +52,7 @@ class TicTacToeDiscordClient(DiscordBot):
     async def on_message(self, message: discord.Message):
       if self.is_ready == False:
         return
-      
+
       message = self.clean_message(message)
 
       # Only interact w/ game owner

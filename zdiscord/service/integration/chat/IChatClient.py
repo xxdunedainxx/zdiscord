@@ -8,3 +8,6 @@ class IChatClient(IIntegration):
 
     def run(self):
         pass
+
+    def is_alive(self) -> bool:
+        return True

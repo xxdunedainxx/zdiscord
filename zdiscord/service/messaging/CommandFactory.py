@@ -83,41 +83,5 @@ class CommandFactory(Service):
                 help_msg_builder += f"Description: {self._COMMAND_CONFIGS[cmd].description}\n"
                 help_msg_builder += f"Example Usage: {self._COMMAND_CONFIGS[cmd].example}\n"
 
-        #help_msg_builder += '\nPRE BUILT COMMANDS:\n'
-        #for cmd in self.__HARD_CODED_ROUTINES.keys():
-        #    if cmd == 'help':
-        #        continue
-        #    else:
-        #        help_msg_builder += f"\n--- {cmd}  ---\n"
-        #        help_msg_builder += f"Description: {self.__HARD_CODED_ROUTINES[cmd]['description']}\n"
-        #        help_msg_builder += f"Example Usage: {self.__HARD_CODED_ROUTINES[cmd]['example']}\n"
-
         # Override value here
         CommandFactory.HELP_MSG = help_msg_builder
-"""
-getattr(module, class_name)
-            if self.__MSG_CONFIGS[cmd].type == 'lambda':
-                # assume method if not a string
-                return self.__MSG_CONFIGS[cmd].main(msg)
-            elif self.__MSG_CONFIGS[cmd].type == 'static_method':
-                return self.__MSG_CONFIGS[cmd].main(self.__MSG_CONFIGS[cmd].arg)
-            # plain string response: ex: 'ping' --> resp 'pong'
-            else:
-def __init_config(self, confLocation: str):
-        conf: {} = json.load(open(confLocation))
-        self.__RAW_CONFIG = conf
-
-        for c in conf.keys():
-            self.__MSG_CONFIGS[c] = Command(
-                userMsg=c,
-                responseMsg=conf[c]['resp'],
-                fallBack=conf[c]['fallback'] if 'fallback' in conf[c].keys() else None,
-                type=conf[c]['type'],
-                main=eval(conf[c]['main']) if 'main' in conf[c].keys() else None,
-                arg=conf[c]['arg'] if 'arg' in conf[c].keys() else '',
-                syncMsg=conf[c]['syncMsg'] if 'syncMsg' in conf[c].keys() else None,
-                description=conf[c]['description'] if 'description' in conf[c].keys() else None,
-                example=conf[c]['example'] if 'example' in conf[c].keys() else None,
-            )
-
-        self._logger.info("init message config")"""

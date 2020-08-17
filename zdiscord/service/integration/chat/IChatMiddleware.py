@@ -30,3 +30,6 @@ class IChatMiddleware(IIntegration):
         except Exception as e:
             self._logger.error(f"Failed to process event {errorStackTrace(e)}")
             return
+
+    def is_alive(self) -> bool:
+        return True

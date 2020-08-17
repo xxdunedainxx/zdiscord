@@ -1,6 +1,5 @@
 import logging
 import sys
-from zdiscord.util.general.Singleton import Singletone
 import os
 
 class LogFactory():

@@ -14,6 +14,7 @@ from zdiscord.util.general.JobManager import JobManager
 from zdiscord.util.general.Job import Job
 from zdiscord.util.general.JobQ import RUNNING_JOBS
 from zdiscord.util.general.JobProcess import JobProcess
+from datetime import datetime
 import random
 import time
 import json
@@ -21,6 +22,7 @@ import string
 
 class AgentFactory(Service):
     def __init__(self, conf: {}):
+        self.last_run_time: datetime = None
         self.conf = json.load(open(conf, encoding='utf-8'))
         self.__init_logger()
 
@@ -43,12 +45,17 @@ class AgentFactory(Service):
         # Initialize redis q for other procs
         MainUtil.init_threadq()
 
-        self.PROC_MAP['main'] = Process(target=App.appMain, args=('./zdiscord/app.json',))
-
-        # Start main worker
-        self.PROC_MAP['main'].start()
+        self.__start_main_proc()
 
         self.__run_main_process()
+
+    def __start_main_proc(self):
+      self.PROC_MAP['main'] = Process(target=App.appMain, args=('./zdiscord/app.json',))
+
+      # Start main worker
+      self.PROC_MAP['main'].start()
+
+      self.last_run_time = datetime.now()
 
     def __init_logger(self):
       if 'log' in self.conf.keys():
@@ -92,6 +99,13 @@ class AgentFactory(Service):
       for key_to_kill in keys_to_kill:
         self.PROC_MAP.pop(key_to_kill)
 
+    def __eval_last_main(self):
+      if(datetime.now() - self.last_run_time).days > 1:
+        self._logger.info("resetting main")
+        self.PROC_MAP['main'].expire()
+        self.PROC_MAP.pop('main')
+        self.__start_main_proc()
+
     def __init_job_factory(self):
         if 'jobs' in self.conf.keys():
             self.JOBS: JobManager = JobManager(jobConfigs=self.conf['jobs'], logConfig=self.conf['log'])
@@ -102,6 +116,8 @@ class AgentFactory(Service):
       try:
         while self.PROC_MAP['main'].is_alive():
           self._logger.info("Still up....")
+          #if (self.PROC_MAP['main'].is_alive()):
+
           if (ThreadQueue.has_thread()):
             agent_config: ThreadQueueObject = ThreadQueue.get_thread_off_queue()
             if agent_config is not None:
@@ -113,6 +129,8 @@ class AgentFactory(Service):
 
           self.__eval_current_threads()
           self.__eval_current_jobs()
+          # Reset main every day due to socket drop issue
+          self.__eval_last_main()
           self.JOBS.run_jobs()
           time.sleep(5)
         print("main process died???")

@@ -133,6 +133,6 @@ class DiscordVoice(commands.Cog):
         chan: discord.VoiceChannel = None
         for ch in channels:
             print("checking channel...")
-            if ch.name == channel:
+            if ch.name.lower() == channel:
                 return ch
         return None

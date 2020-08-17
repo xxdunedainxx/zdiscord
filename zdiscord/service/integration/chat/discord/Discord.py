@@ -13,3 +13,6 @@ class Discord(Service):
     def run(self):
         self.bootstrap(self.conf)
         self.middleware.run()
+
+    def is_alive(self) -> bool:
+        return self.middleware.is_alive()

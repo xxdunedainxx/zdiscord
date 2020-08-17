@@ -9,7 +9,7 @@ import json
 from typing import Any
 
 class Command:
-    def __init__(self, command: str, responseMsg: str,type, logic: Any = None, fallBack = None, arg: str = '', syncMsg: str = None,description: str = None, example: str = None):
+    def __init__(self, command: str, responseMsg: str,type, logic: Any = None, fallBack = None, arg: str = '', syncMsg: str = None,description: str = None, example: str = None, retries: int = 3):
         self.command = command
         self.response = responseMsg
         self.command_logic = logic
@@ -19,6 +19,7 @@ class Command:
         self.sync_msg: str = syncMsg
         self.description = description
         self.example = example
+        self.retries: int = retries
 
     # execute command logic
     def run(self, event: DiscordEvent):
@@ -38,6 +39,7 @@ class SimpleStringCommand(Command):
             syncMsg=conf['syncMsg'] if 'syncMsg' in conf.keys() else None,
             description=conf['description'] if 'description' in conf.keys() else None,
             example=conf['example'] if 'example' in conf.keys() else None,
+            retries=conf['retries'] if 'retries' in conf.keys() else 3,
         )
     # execute command logic
     async def run(self, event: DiscordEvent):
@@ -55,6 +57,7 @@ class LambdaMessageCommand(Command):
             syncMsg=conf['syncMsg'] if 'syncMsg' in conf.keys() else None,
             description=conf['description'] if 'description' in conf.keys() else None,
             example=conf['example'] if 'example' in conf.keys() else None,
+            retries=conf['retries'] if 'retries' in conf.keys() else 3,
         )
     # execute command logic
     async def run(self, event: DiscordEvent):
@@ -75,6 +78,7 @@ class StaticCommand(Command):
             syncMsg=conf['syncMsg'] if 'syncMsg' in conf.keys() else None,
             description=conf['description'] if 'description' in conf.keys() else None,
             example=conf['example'] if 'example' in conf.keys() else None,
+            retries=conf['retries'] if 'retries' in conf.keys() else 3,
         )
     # execute command logic
     async def run(self, event: DiscordEvent):
